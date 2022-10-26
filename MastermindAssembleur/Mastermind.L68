@@ -1,0 +1,1945 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 26/10/2022 11:27:31
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Mastermind
+00000000                             3  * Written by : Damien DECORTE & Pauline DEHORS
+00000000                             4  * Date       :
+00000000                             5  * Description: Jeu du MasterMind
+00000000                             6  *-----------------------------------------------------------
+00000400                             7      ORG         $400
+00000400                             8  START:                  ; first instruction of program
+00000400                             9  *****Dessin
+00000400                            10  
+00000400  223C 049C030C             11      MOVE.L      #$049C030C,D1           ; Résolution de 1180x780
+00000406  4EB9 00001A3A             12      JSR         RESOLUTION              ; Appel système RESOLUTION qui change la résolution
+0000040C                            13      
+0000040C                            14  **écran d'accueil du jeu
+0000040C                            15  MENU:
+0000040C  7200                      16      MOVE.L      #$00000000,D1           ; Changement de la couleur du contour de rectangle rempli pour du noir
+0000040E  4EB9 00001A4A             17      JSR         SET_PEN_COLOR
+00000414  223C 00A0A59C             18      MOVE.L      #$00A0A59C,D1           ; Changement de la couleur de remplissage pour du gris
+0000041A  4EB9 00001A52             19      JSR         SET_FILL_COLOR
+00000420  323C 0005                 20      MOVE.W      #5,D1                   ; Positionnement
+00000424  343C 0005                 21      MOVE.W      #5,D2
+00000428  363C 0497                 22      MOVE.W      #1175,D3
+0000042C  383C 0307                 23      MOVE.W      #775,D4
+00000430  4EB9 00001A82             24      JSR         DRAW_FILL_RECT    
+00000436                            25      
+00000436  227C 00001AB3             26      MOVE.L      #TEXTE_ACCUEIL,A1       ; écriture du texte d'accueil grâce à DRAW_STRING
+0000043C  7200                      27      MOVE.L      #$00000000,D1           ; On change la couleur du texte
+0000043E  243C 06400001             28      MOVE.L      #$06400001,D2           ; On change la police d'écriture et la taille, ainsi que le texte en gras
+00000444  103C 0015                 29      MOVE.B      #21,D0
+00000448  4E4F                      30      TRAP        #15
+0000044A  323C 0168                 31      MOVE.W      #360,D1
+0000044E  343C 0050                 32      MOVE.W      #80,D2
+00000452  4EB9 00001A9A             33      JSR         DRAW_STRING
+00000458                            34      
+00000458  7200                      35      MOVE.L      #$00000000,D1           ; Carré du bouton PLAY
+0000045A  4EB9 00001A4A             36      JSR         SET_PEN_COLOR
+00000460  223C 006C6C6C             37      MOVE.L      #$006C6C6C,D1
+00000466  4EB9 00001A52             38      JSR         SET_FILL_COLOR
+0000046C  323C 01C2                 39      MOVE.W      #450,D1
+00000470  343C 015E                 40      MOVE.W      #350,D2
+00000474  363C 02DF                 41      MOVE.W      #735,D3
+00000478  383C 01C2                 42      MOVE.W      #450,D4
+0000047C  4EB9 00001A82             43      JSR         DRAW_FILL_RECT   
+00000482                            44      
+00000482  227C 00001ABE             45      MOVE.L      #TEXTE_PLAY,A1          ; Texte du bouton PLAY
+00000488  7200                      46      MOVE.L      #$00000000,D1
+0000048A  243C 061B0001             47      MOVE.L      #$061B0001,D2
+00000490  103C 0015                 48      MOVE.B      #21,D0
+00000494  4E4F                      49      TRAP        #15
+00000496  323C 01CC                 50      MOVE.W      #460,D1
+0000049A  343C 017C                 51      MOVE.W      #380,D2
+0000049E  4EB9 00001A9A             52      JSR         DRAW_STRING
+000004A4                            53      
+000004A4  7200                      54      MOVE.L      #$00000000,D1           ; Carré du bouton REGLES
+000004A6  4EB9 00001A4A             55      JSR         SET_PEN_COLOR
+000004AC  223C 006C6C6C             56      MOVE.L      #$006C6C6C,D1
+000004B2  4EB9 00001A52             57      JSR         SET_FILL_COLOR
+000004B8  323C 01F4                 58      MOVE.W      #500,D1
+000004BC  343C 01F4                 59      MOVE.W      #500,D2
+000004C0  363C 02AD                 60      MOVE.W      #685,D3
+000004C4  383C 0258                 61      MOVE.W      #600,D4
+000004C8  4EB9 00001A82             62      JSR         DRAW_FILL_RECT  
+000004CE                            63      
+000004CE  227C 00001ACC             64      MOVE.L      #TEXTE_REGLE,A1         ; Texte du bouton REGLES
+000004D4  7200                      65      MOVE.L      #$00000000,D1
+000004D6  243C 061B0001             66      MOVE.L      #$061B0001,D2
+000004DC  103C 0015                 67      MOVE.B      #21,D0
+000004E0  4E4F                      68      TRAP        #15
+000004E2  323C 0217                 69      MOVE.W      #535,D1
+000004E6  343C 0212                 70      MOVE.W      #530,D2
+000004EA  4EB9 00001A9A             71      JSR         DRAW_STRING
+000004F0                            72      
+000004F0  223C 00A0A59C             73      MOVE.L      #$00A0A59C,D1           ; On remet la couleur gris pour le fond pour afficher le texte AUTHOR
+000004F6  4EB9 00001A52             74      JSR         SET_FILL_COLOR
+000004FC  227C 00001AD3             75      MOVE.L      #TEXTE_AUTHOR,A1        ; Texte des développeurs
+00000502  7200                      76      MOVE.L      #$00000000,D1
+00000504  243C 06130000             77      MOVE.L      #$06130000,D2
+0000050A  103C 0015                 78      MOVE.B      #21,D0
+0000050E  4E4F                      79      TRAP        #15
+00000510  323C 0168                 80      MOVE.W      #360,D1
+00000514  343C 02E4                 81      MOVE.W      #740,D2
+00000518  4EB9 00001A9A             82      JSR         DRAW_STRING
+0000051E                            83      
+0000051E                            84  ; Les 8 prochains bloc d'instructions servent à dessiner les petits rectangles de couleur
+0000051E                            85  ; dans le menu principal
+0000051E  223C 000607E7             86      MOVE.L      #$000607E7,D1
+00000524  4EB9 00001A4A             87      JSR         SET_PEN_COLOR
+0000052A  223C 000607E7             88      MOVE.L      #$000607E7,D1
+00000530  4EB9 00001A52             89      JSR         SET_FILL_COLOR
+00000536  323C 00FA                 90      MOVE.W      #250,D1
+0000053A  343C 0019                 91      MOVE.W      #25,D2
+0000053E  363C 012C                 92      MOVE.W      #300,D3
+00000542  383C 004B                 93      MOVE.W      #75,D4
+00000546  4EB9 00001A82             94      JSR         DRAW_FILL_RECT 
+0000054C                            95      
+0000054C  223C 00DD32EE             96      MOVE.L      #$00DD32EE,D1
+00000552  4EB9 00001A4A             97      JSR         SET_PEN_COLOR
+00000558  223C 00DD32EE             98      MOVE.L      #$00DD32EE,D1
+0000055E  4EB9 00001A52             99      JSR         SET_FILL_COLOR
+00000564  323C 004B                100      MOVE.W      #75,D1
+00000568  343C 00C8                101      MOVE.W      #200,D2
+0000056C  363C 007D                102      MOVE.W      #125,D3
+00000570  383C 00FA                103      MOVE.W      #250,D4
+00000574  4EB9 00001A82            104      JSR         DRAW_FILL_RECT
+0000057A                           105      
+0000057A  223C 00183C90            106      MOVE.L      #$00183C90,D1
+00000580  4EB9 00001A4A            107      JSR         SET_PEN_COLOR
+00000586  223C 00183C90            108      MOVE.L      #$00183C90,D1
+0000058C  4EB9 00001A52            109      JSR         SET_FILL_COLOR
+00000592  323C 00F0                110      MOVE.W      #240,D1
+00000596  343C 01F4                111      MOVE.W      #500,D2
+0000059A  363C 0122                112      MOVE.W      #290,D3
+0000059E  383C 0226                113      MOVE.W      #550,D4
+000005A2  4EB9 00001A82            114      JSR         DRAW_FILL_RECT
+000005A8                           115      
+000005A8  223C 006DDD43            116      MOVE.L      #$006DDD43,D1
+000005AE  4EB9 00001A4A            117      JSR         SET_PEN_COLOR
+000005B4  223C 006DDD43            118      MOVE.L      #$006DDD43,D1
+000005BA  4EB9 00001A52            119      JSR         SET_FILL_COLOR
+000005C0  323C 0032                120      MOVE.W      #50,D1
+000005C4  343C 028A                121      MOVE.W      #650,D2
+000005C8  363C 0064                122      MOVE.W      #100,D3
+000005CC  383C 02BC                123      MOVE.W      #700,D4
+000005D0  4EB9 00001A82            124      JSR         DRAW_FILL_RECT
+000005D6                           125      
+000005D6  223C 00EC5A07            126      MOVE.L      #$00EC5A07,D1
+000005DC  4EB9 00001A4A            127      JSR         SET_PEN_COLOR
+000005E2  223C 00EC5A07            128      MOVE.L      #$00EC5A07,D1
+000005E8  4EB9 00001A52            129      JSR         SET_FILL_COLOR
+000005EE  323C 0384                130      MOVE.W      #900,D1
+000005F2  343C 005A                131      MOVE.W      #90,D2
+000005F6  363C 03B6                132      MOVE.W      #950,D3
+000005FA  383C 008C                133      MOVE.W      #140,D4
+000005FE  4EB9 00001A82            134      JSR         DRAW_FILL_RECT
+00000604                           135      
+00000604  223C 00154CFB            136      MOVE.L      #$00154CFB,D1
+0000060A  4EB9 00001A4A            137      JSR         SET_PEN_COLOR
+00000610  223C 00154CFB            138      MOVE.L      #$00154CFB,D1
+00000616  4EB9 00001A52            139      JSR         SET_FILL_COLOR
+0000061C  323C 0438                140      MOVE.W      #1080,D1
+00000620  343C 00FA                141      MOVE.W      #250,D2
+00000624  363C 046A                142      MOVE.W      #1130,D3
+00000628  383C 012C                143      MOVE.W      #300,D4
+0000062C  4EB9 00001A82            144      JSR         DRAW_FILL_RECT
+00000632                           145      
+00000632  223C 00FF3881            146      MOVE.L      #$00FF3881,D1
+00000638  4EB9 00001A4A            147      JSR         SET_PEN_COLOR
+0000063E  223C 00FF3881            148      MOVE.L      #$00FF3881,D1
+00000644  4EB9 00001A52            149      JSR         SET_FILL_COLOR
+0000064A  323C 0370                150      MOVE.W      #880,D1
+0000064E  343C 015E                151      MOVE.W      #350,D2
+00000652  363C 033E                152      MOVE.W      #830,D3
+00000656  383C 0190                153      MOVE.W      #400,D4
+0000065A  4EB9 00001A82            154      JSR         DRAW_FILL_RECT
+00000660                           155      
+00000660  223C 0047F2FF            156      MOVE.L      #$0047F2FF,D1
+00000666  4EB9 00001A4A            157      JSR         SET_PEN_COLOR
+0000066C  223C 0047F2FF            158      MOVE.L      #$0047F2FF,D1
+00000672  4EB9 00001A52            159      JSR         SET_FILL_COLOR
+00000678  323C 03A2                160      MOVE.W      #930,D1
+0000067C  343C 028A                161      MOVE.W      #650,D2
+00000680  363C 03D4                162      MOVE.W      #980,D3
+00000684  383C 02BC                163      MOVE.W      #700,D4
+00000688  4EB9 00001A82            164      JSR         DRAW_FILL_RECT
+0000068E                           165      
+0000068E                           166  ; Clic sur le bouton START
+0000068E                           167  CLIC_START_GAME:    
+0000068E  7200                     168      MOVE.L      #0,D1                   ; Déplacement de 0 dans D1 afin de récupérer les informations du clic
+00000690  4EB9 00001A42            169      JSR         GET_MOUSE               ; On utilise GET_MOUSE (Stock dans D0.B, les informations du clic, dans D1.L et la position de la souris (16 bits Y, 16 bits X))
+00000696  B03C 0001                170      CMP.B       #1,D0                   ; On test si le clic gauche est pressé
+0000069A  66F2                     171      BNE         CLIC_START_GAME         ; Si non, on test de nouveau
+0000069C                           172  RELACHE_CLIC_START_GAME:
+0000069C  7200                     173      MOVE.L      #0,D1                   ; On remet 0 à D1, pour tester si le clic est relâché
+0000069E  4EB9 00001A42            174      JSR         GET_MOUSE               ; On lit le clic souris
+000006A4  B03C 0000                175      CMP.B       #0,D0                   ; Si le clic gauche n'est plus pressé, on fait la suite, sinon on relance la boucle
+000006A8  66F2                     176      BNE         RELACHE_CLIC_START_GAME
+000006AA                           177  FIN_BOUCLE_CLIC_START_GAME:             ; Si le clic est gauche est pressé
+000006AA  3601                     178      MOVE.W      D1,D3                   ; On déplace les coordonnées X dans D3
+000006AC  4841                     179      SWAP        D1                      ; On inverse les deux octets de poids faible avec ceux de poids fort pour sauvegarder les coordonnées Y
+000006AE  3801                     180      MOVE.W      D1,D4                   ; On déplace les coordonées Y dans D4
+000006B0                           181        
+000006B0                           182  ; Test si la zone cliqué est la zone du bouton PLAY
+000006B0                           183  TEST_START_GAME:                        ; On test le clic dans le carré PLAY
+000006B0  B67C 01C2                184      CMP.W       #450,D3                 ; x > 450
+000006B4  6A00 0004                185      BPL         SUITE_START_GAME_XM     ; Si oui, on continue
+000006B8  60D4                     186      BRA         CLIC_START_GAME         ; Si non, on retente un clic souris 
+000006BA                           187  SUITE_START_GAME_XM:                    
+000006BA  B67C 02DF                188      CMP.W       #735,D3                 ; x < 735
+000006BE  6B00 0004                189      BMI         SUITE_START_GAME_YP     ; Si oui, on continue
+000006C2  60CA                     190      BRA         CLIC_START_GAME         ; Si x > 735, on retente un clic souris
+000006C4                           191  SUITE_START_GAME_YP:
+000006C4  B87C 015E                192      CMP.W       #350,D4                 ; y > 350
+000006C8  6A00 0004                193      BPL         SUITE_START_GAME_YM     ; Si oui, on continue
+000006CC  60C0                     194      BRA         CLIC_START_GAME         ; Si non, on retente un clic souris
+000006CE                           195  SUITE_START_GAME_YM:                    
+000006CE  B87C 01C2                196      CMP.W       #450,D4                 ; y > 450
+000006D2  6A00 0006                197      BPL         TEST_REGLE_GAME         ; Si oui, on test le carré adjacent en dessous au carré PLAY: Ici le carré REGLES
+000006D6  6000 03AE                198      BRA         DEBUT_PARTIE            ; Si non, on lance la partie
+000006DA                           199      
+000006DA                           200  ; Test si la zone cliqué est la zone du bouton REGLES
+000006DA                           201  TEST_REGLE_GAME:
+000006DA  B67C 01F4                202      CMP.W       #500,D3                 ; x > 500
+000006DE  6A00 0004                203      BPL         SUITE_REGLE_GAME_XM     ; Si oui, on continue
+000006E2  60AA                     204      BRA         CLIC_START_GAME         ; Si non, on retente un clic souris
+000006E4                           205  SUITE_REGLE_GAME_XM:                    
+000006E4  B67C 02AD                206      CMP.W       #685,D3                 ; x < 685
+000006E8  6B00 0004                207      BMI         SUITE_REGLE_GAME_YP     ; Si oui, on continue
+000006EC  60A0                     208      BRA         CLIC_START_GAME         ; Si x > 685, on retente un clic souris
+000006EE                           209  SUITE_REGLE_GAME_YP:
+000006EE  B87C 01F4                210      CMP.W       #500,D4                 ; y > 500
+000006F2  6A00 0004                211      BPL         SUITE_REGLE_GAME_YM     ; Si oui, on continue
+000006F6  6096                     212      BRA         CLIC_START_GAME         ; Si non, on retente un clic souris
+000006F8                           213  SUITE_REGLE_GAME_YM:                    
+000006F8  B87C 0258                214      CMP.W       #600,D4                 ; y > 600
+000006FC  6A90                     215      BPL         CLIC_START_GAME         ; Si oui, on retente un clic souris
+000006FE  6000 0002                216      BRA         REGLES                  ; Sinon, on affiche l'écran des règles
+00000702                           217      
+00000702                           218  **écran de règles du jeu
+00000702                           219  REGLES:
+00000702  7200                     220      MOVE.L      #$00000000,D1           ; On dessine le fond avec un rectangle rempli gris et d'un contour noir
+00000704  4EB9 00001A4A            221      JSR         SET_PEN_COLOR
+0000070A  223C 00A0A59C            222      MOVE.L      #$00A0A59C,D1
+00000710  4EB9 00001A52            223      JSR         SET_FILL_COLOR
+00000716  323C 0005                224      MOVE.W      #5,D1
+0000071A  343C 0005                225      MOVE.W      #5,D2
+0000071E  363C 0497                226      MOVE.W      #1175,D3
+00000722  383C 0307                227      MOVE.W      #775,D4
+00000726  4EB9 00001A82            228      JSR         DRAW_FILL_RECT    
+0000072C                           229      
+0000072C  227C 00001AF6            230      MOVE.L      #REGLES_TITRE,A1         ; On affiche les titres de l'écran règles
+00000732  7200                     231      MOVE.L      #$00000000,D1
+00000734  243C 063C0001            232      MOVE.L      #$063C0001,D2
+0000073A  103C 0015                233      MOVE.B      #21,D0
+0000073E  4E4F                     234      TRAP        #15
+00000740  323C 013B                235      MOVE.W      #315,D1
+00000744  343C 001E                236      MOVE.W      #30,D2
+00000748  4EB9 00001A9A            237      JSR         DRAW_STRING
+0000074E                           238      
+0000074E                           239  ; les 9 prochains blocs servent à écrire les 9 lignes des règles
+0000074E  227C 00001B04            240      MOVE.L      #REGLES_L1,A1            
+00000754  7200                     241      MOVE.L      #$00000000,D1
+00000756  243C 06100000            242      MOVE.L      #$06100000,D2
+0000075C  103C 0015                243      MOVE.B      #21,D0
+00000760  4E4F                     244      TRAP        #15
+00000762  323C 00E6                245      MOVE.W      #230,D1
+00000766  343C 00E1                246      MOVE.W      #225,D2
+0000076A  4EB9 00001A9A            247      JSR         DRAW_STRING
+00000770                           248      
+00000770  227C 00001B42            249      MOVE.L      #REGLES_L2,A1
+00000776  7200                     250      MOVE.L      #$00000000,D1
+00000778  243C 06100000            251      MOVE.L      #$06100000,D2
+0000077E  103C 0015                252      MOVE.B      #21,D0
+00000782  4E4F                     253      TRAP        #15
+00000784  323C 00E6                254      MOVE.W      #230,D1
+00000788  343C 00FA                255      MOVE.W      #250,D2
+0000078C  4EB9 00001A9A            256      JSR         DRAW_STRING
+00000792                           257      
+00000792  227C 00001B7B            258      MOVE.L      #REGLES_L3,A1
+00000798  7200                     259      MOVE.L      #$00000000,D1
+0000079A  243C 06100000            260      MOVE.L      #$06100000,D2
+000007A0  103C 0015                261      MOVE.B      #21,D0
+000007A4  4E4F                     262      TRAP        #15
+000007A6  323C 00E6                263      MOVE.W      #230,D1
+000007AA  343C 0113                264      MOVE.W      #275,D2
+000007AE  4EB9 00001A9A            265      JSR         DRAW_STRING
+000007B4                           266      
+000007B4  227C 00001B92            267      MOVE.L      #REGLES_L4,A1
+000007BA  7200                     268      MOVE.L      #$00000000,D1
+000007BC  243C 06100000            269      MOVE.L      #$06100000,D2
+000007C2  103C 0015                270      MOVE.B      #21,D0
+000007C6  4E4F                     271      TRAP        #15
+000007C8  323C 00E6                272      MOVE.W      #230,D1
+000007CC  343C 012C                273      MOVE.W      #300,D2
+000007D0  4EB9 00001A9A            274      JSR         DRAW_STRING
+000007D6                           275   
+000007D6  227C 00001BD4            276      MOVE.L      #REGLES_L5,A1
+000007DC  7200                     277      MOVE.L      #$00000000,D1
+000007DE  243C 06100000            278      MOVE.L      #$06100000,D2
+000007E4  103C 0015                279      MOVE.B      #21,D0
+000007E8  4E4F                     280      TRAP        #15
+000007EA  323C 00E6                281      MOVE.W      #230,D1
+000007EE  343C 0145                282      MOVE.W      #325,D2
+000007F2  4EB9 00001A9A            283      JSR         DRAW_STRING
+000007F8                           284   
+000007F8  227C 00001C11            285      MOVE.L      #REGLES_L6,A1
+000007FE  7200                     286      MOVE.L      #$00000000,D1
+00000800  243C 06100000            287      MOVE.L      #$06100000,D2
+00000806  103C 0015                288      MOVE.B      #21,D0
+0000080A  4E4F                     289      TRAP        #15
+0000080C  323C 00E6                290      MOVE.W      #230,D1
+00000810  343C 015E                291      MOVE.W      #350,D2
+00000814  4EB9 00001A9A            292      JSR         DRAW_STRING
+0000081A                           293   
+0000081A  227C 00001C4F            294      MOVE.L      #REGLES_L7,A1
+00000820  7200                     295      MOVE.L      #$00000000,D1
+00000822  243C 06100000            296      MOVE.L      #$06100000,D2
+00000828  103C 0015                297      MOVE.B      #21,D0
+0000082C  4E4F                     298      TRAP        #15
+0000082E  323C 00E6                299      MOVE.W      #230,D1
+00000832  343C 0177                300      MOVE.W      #375,D2
+00000836  4EB9 00001A9A            301      JSR         DRAW_STRING
+0000083C                           302      
+0000083C  227C 00001C70            303      MOVE.L      #REGLES_L8,A1
+00000842  7200                     304      MOVE.L      #$00000000,D1
+00000844  243C 06100000            305      MOVE.L      #$06100000,D2
+0000084A  103C 0015                306      MOVE.B      #21,D0
+0000084E  4E4F                     307      TRAP        #15
+00000850  323C 00E6                308      MOVE.W      #230,D1
+00000854  343C 0190                309      MOVE.W      #400,D2
+00000858  4EB9 00001A9A            310      JSR         DRAW_STRING
+0000085E                           311      
+0000085E  227C 00001CB4            312      MOVE.L      #REGLES_L9,A1
+00000864  7200                     313      MOVE.L      #$00000000,D1
+00000866  243C 06100000            314      MOVE.L      #$06100000,D2
+0000086C  103C 0015                315      MOVE.B      #21,D0
+00000870  4E4F                     316      TRAP        #15
+00000872  323C 00E6                317      MOVE.W      #230,D1
+00000876  343C 01A9                318      MOVE.W      #425,D2
+0000087A  4EB9 00001A9A            319      JSR         DRAW_STRING
+00000880                           320      
+00000880                           321  ; Les 8 prochains blocs servent à dessiner les petits rectangles de couleurs autour du texte
+00000880  223C 00DD32EE            322      MOVE.L      #$00DD32EE,D1
+00000886  4EB9 00001A4A            323      JSR         SET_PEN_COLOR
+0000088C  223C 00DD32EE            324      MOVE.L      #$00DD32EE,D1
+00000892  4EB9 00001A52            325      JSR         SET_FILL_COLOR
+00000898  323C 00AF                326      MOVE.W      #175,D1
+0000089C  343C 004B                327      MOVE.W      #75,D2
+000008A0  363C 00E1                328      MOVE.W      #225,D3
+000008A4  383C 007D                329      MOVE.W      #125,D4
+000008A8  4EB9 00001A82            330      JSR         DRAW_FILL_RECT 
+000008AE                           331      
+000008AE  223C 000607E7            332      MOVE.L      #$000607E7,D1
+000008B4  4EB9 00001A4A            333      JSR         SET_PEN_COLOR
+000008BA  223C 000607E7            334      MOVE.L      #$000607E7,D1
+000008C0  4EB9 00001A52            335      JSR         SET_FILL_COLOR
+000008C6  323C 0050                336      MOVE.W      #80,D1
+000008CA  343C 020D                337      MOVE.W      #525,D2
+000008CE  363C 0082                338      MOVE.W      #130,D3
+000008D2  383C 023F                339      MOVE.W      #575,D4
+000008D6  4EB9 00001A82            340      JSR         DRAW_FILL_RECT
+000008DC                           341      
+000008DC  223C 00183C90            342      MOVE.L      #$00183C90,D1
+000008E2  4EB9 00001A4A            343      JSR         SET_PEN_COLOR
+000008E8  223C 00183C90            344      MOVE.L      #$00183C90,D1
+000008EE  4EB9 00001A52            345      JSR         SET_FILL_COLOR
+000008F4  323C 005A                346      MOVE.W      #90,D1
+000008F8  343C 0145                347      MOVE.W      #325,D2
+000008FC  363C 008C                348      MOVE.W      #140,D3
+00000900  383C 0177                349      MOVE.W      #375,D4
+00000904  4EB9 00001A82            350      JSR         DRAW_FILL_RECT
+0000090A                           351      
+0000090A  223C 006DDD43            352      MOVE.L      #$006DDD43,D1
+00000910  4EB9 00001A4A            353      JSR         SET_PEN_COLOR
+00000916  223C 006DDD43            354      MOVE.L      #$006DDD43,D1
+0000091C  4EB9 00001A52            355      JSR         SET_FILL_COLOR
+00000922  323C 00FA                356      MOVE.W      #250,D1
+00000926  343C 0271                357      MOVE.W      #625,D2
+0000092A  363C 012C                358      MOVE.W      #300,D3
+0000092E  383C 02A3                359      MOVE.W      #675,D4
+00000932  4EB9 00001A82            360      JSR         DRAW_FILL_RECT
+00000938                           361  
+00000938  223C 0047F2FF            362      MOVE.L      #$0047F2FF,D1
+0000093E  4EB9 00001A4A            363      JSR         SET_PEN_COLOR
+00000944  223C 0047F2FF            364      MOVE.L      #$0047F2FF,D1
+0000094A  4EB9 00001A52            365      JSR         SET_FILL_COLOR
+00000950  323C 0316                366      MOVE.W      #790,D1
+00000954  343C 020D                367      MOVE.W      #525,D2
+00000958  363C 0348                368      MOVE.W      #840,D3
+0000095C  383C 023F                369      MOVE.W      #575,D4
+00000960  4EB9 00001A82            370      JSR         DRAW_FILL_RECT
+00000966                           371      
+00000966  223C 00FF3881            372      MOVE.L      #$00FF3881,D1
+0000096C  4EB9 00001A4A            373      JSR         SET_PEN_COLOR
+00000972  223C 00FF3881            374      MOVE.L      #$00FF3881,D1
+00000978  4EB9 00001A52            375      JSR         SET_FILL_COLOR
+0000097E  323C 03C5                376      MOVE.W      #965,D1
+00000982  343C 0258                377      MOVE.W      #600,D2
+00000986  363C 03F7                378      MOVE.W      #1015,D3
+0000098A  383C 028A                379      MOVE.W      #650,D4
+0000098E  4EB9 00001A82            380      JSR         DRAW_FILL_RECT   
+00000994                           381   
+00000994  223C 00154CFB            382      MOVE.L      #$00154CFB,D1
+0000099A  4EB9 00001A4A            383      JSR         SET_PEN_COLOR
+000009A0  223C 00154CFB            384      MOVE.L      #$00154CFB,D1
+000009A6  4EB9 00001A52            385      JSR         SET_FILL_COLOR
+000009AC  323C 0433                386      MOVE.W      #1075,D1
+000009B0  343C 015E                387      MOVE.W      #350,D2
+000009B4  363C 0465                388      MOVE.W      #1125,D3
+000009B8  383C 0190                389      MOVE.W      #400,D4
+000009BC  4EB9 00001A82            390      JSR         DRAW_FILL_RECT  
+000009C2                           391  
+000009C2  223C 00EC5A07            392      MOVE.L      #$00EC5A07,D1
+000009C8  4EB9 00001A4A            393      JSR         SET_PEN_COLOR
+000009CE  223C 00EC5A07            394      MOVE.L      #$00EC5A07,D1
+000009D4  4EB9 00001A52            395      JSR         SET_FILL_COLOR
+000009DA  323C 03D4                396      MOVE.W      #980,D1
+000009DE  343C 0064                397      MOVE.W      #100,D2
+000009E2  363C 0406                398      MOVE.W      #1030,D3
+000009E6  383C 0096                399      MOVE.W      #150,D4
+000009EA  4EB9 00001A82            400      JSR         DRAW_FILL_RECT 
+000009F0                           401      
+000009F0                           402  ; On dessine le rectangle pour le bouton du menu principal
+000009F0  7200                     403      MOVE.L      #$00000000,D1
+000009F2  4EB9 00001A4A            404      JSR         SET_PEN_COLOR
+000009F8  223C 006C6C6C            405      MOVE.L      #$006C6C6C,D1
+000009FE  4EB9 00001A52            406      JSR         SET_FILL_COLOR
+00000A04  323C 01F4                407      MOVE.W      #500,D1
+00000A08  343C 01F4                408      MOVE.W      #500,D2
+00000A0C  363C 02AD                409      MOVE.W      #685,D3
+00000A10  383C 0258                410      MOVE.W      #600,D4
+00000A14  4EB9 00001A82            411      JSR         DRAW_FILL_RECT 
+00000A1A                           412      
+00000A1A                           413  ; On dessine le texte MENU sur le bouton
+00000A1A  227C 00001CDB            414      MOVE.L      #REGLES_MENU_BUTTON,A1     
+00000A20  7200                     415      MOVE.L      #$00000000,D1
+00000A22  243C 061E0001            416      MOVE.L      #$061E0001,D2
+00000A28  103C 0015                417      MOVE.B      #21,D0
+00000A2C  4E4F                     418      TRAP        #15
+00000A2E  323C 0221                419      MOVE.W      #545,D1
+00000A32  343C 0212                420      MOVE.W      #530,D2
+00000A36  4EB9 00001A9A            421      JSR         DRAW_STRING
+00000A3C                           422      
+00000A3C                           423  ; Gestion du clic sur le bouton retour au menu
+00000A3C                           424  CLIC_RETURN_MENU:    
+00000A3C  7200                     425      MOVE.L      #0,D1                       ; Déplacement de 0 dans D1 afin de récupérer
+00000A3E  4EB9 00001A42            426      JSR         GET_MOUSE                   ; On utilise GET_MOUSE
+00000A44  B03C 0001                427      CMP.B       #1,D0                       ; On test si le clic gauche est pressé
+00000A48  66F2                     428      BNE         CLIC_RETURN_MENU            ; Si non, on test de nouveau
+00000A4A                           429  RELACHE_CLIC_RETURN_MENU:
+00000A4A  7200                     430      MOVE.L      #0,D1                       ; On remet D1 à 0 pour retester un clic
+00000A4C  4EB9 00001A42            431      JSR         GET_MOUSE                   ; On lit le clic grâce à GET_MOUSE
+00000A52  B03C 0000                432      CMP.B       #0,D0                       ; Si le clic est relâché, on passe à la suite, sinon on retente un clic
+00000A56  66F2                     433      BNE         RELACHE_CLIC_RETURN_MENU
+00000A58                           434  FIN_BOUCLE_CLIC_RETURN_MENU:                ; Si le clic est gauche est relâché
+00000A58  3601                     435      MOVE.W      D1,D3                       ; On déplace les coordonnées X dans D3
+00000A5A  4841                     436      SWAP        D1                          ; On inverse les deux octets de poids faible avec ceux de poids fort pour sauvegarder les coordonnées Y
+00000A5C  3801                     437      MOVE.W      D1,D4                       ; On déplace les coordonées Y dans D4    
+00000A5E                           438    
+00000A5E                           439  TEST_REGLE_MENU:
+00000A5E  B67C 01F4                440      CMP.W       #500,D3                 ; x > 500
+00000A62  6A00 0004                441      BPL         SUITE_REGLE_MENU_XM     ; Si oui, on continue
+00000A66  60D4                     442      BRA         CLIC_RETURN_MENU        ; Si non, on retente un clic souris
+00000A68                           443  SUITE_REGLE_MENU_XM:                    
+00000A68  B67C 02AD                444      CMP.W       #685,D3                 ; x < 685
+00000A6C  6B00 0004                445      BMI         SUITE_REGLE_MENU_YP     ; Si oui, on continue
+00000A70  60CA                     446      BRA         CLIC_RETURN_MENU        ; Si x > 685, on retente un clic souris
+00000A72                           447  SUITE_REGLE_MENU_YP:
+00000A72  B87C 01F4                448      CMP.W       #500,D4                 ; y > 500
+00000A76  6A00 0004                449      BPL         SUITE_REGLE_MENU_YM     ; Si oui, on continue
+00000A7A  60C0                     450      BRA         CLIC_RETURN_MENU        ; Si non, on retente un clic souris
+00000A7C                           451  SUITE_REGLE_MENU_YM:                    
+00000A7C  B87C 0258                452      CMP.W       #600,D4                 ; y > 600
+00000A80  6ABA                     453      BPL         CLIC_RETURN_MENU        ; Si oui, on retente un clic souris
+00000A82  6000 F988                454      BRA         MENU                    ; Si non, on est sur le bouton, donc retour au menu
+00000A86                           455  
+00000A86                           456  DEBUT_PARTIE:
+00000A86                           457  **Reset des variables de positionnement
+00000A86  207C 00001CFC            458      MOVE.L      #PLACE_POS_X1,A0
+00000A8C  30BC 002B                459      MOVE.W      #43,(A0)
+00000A90  207C 00001CFE            460      MOVE.L      #PLACE_POS_X2,A0
+00000A96  30BC 005D                461      MOVE.W      #93,(A0)
+00000A9A  207C 00001D00            462      MOVE.L      #PLACE_POS_Y1,A0
+00000AA0  30BC 0025                463      MOVE.W      #37,(A0)
+00000AA4  207C 00001D02            464      MOVE.L      #PLACE_POS_Y2,A0
+00000AAA  30BC 0057                465      MOVE.W      #87,(A0)
+00000AAE                           466  
+00000AAE  207C 00001D04            467      MOVE.L      #PLACE_POS_SOLUCE_Y1,A0
+00000AB4  30BC 0025                468      MOVE.W      #37,(A0)
+00000AB8  207C 00001D06            469      MOVE.L      #PLACE_POS_SOLUCE_Y2,A0
+00000ABE  30BC 0057                470      MOVE.W      #87,(A0)
+00000AC2                           471  
+00000AC2  207C 00001D08            472      MOVE.L      #PLACE_POS_X1_BIEN_PLACE,A0
+00000AC8  30BC 0028                473      MOVE.W      #40,(A0)
+00000ACC  207C 00001D0A            474      MOVE.L      #PLACE_POS_X2_BIEN_PLACE,A0
+00000AD2  30BC 003C                475      MOVE.W      #60,(A0)
+00000AD6  207C 00001D0C            476      MOVE.L      #PLACE_POS_Y1_BIEN_PLACE,A0
+00000ADC  30BC 01D8                477      MOVE.W      #472,(A0)
+00000AE0  207C 00001D0E            478      MOVE.L      #PLACE_POS_Y2_BIEN_PLACE,A0
+00000AE6  30BC 01EC                479      MOVE.W      #492,(A0)
+00000AEA                           480  
+00000AEA  207C 00001D10            481      MOVE.L      #PLACE_POS_X1_CHIFFRE,A0
+00000AF0  30BC 0046                482      MOVE.W      #70,(A0)
+00000AF4  207C 00001D12            483      MOVE.L      #PLACE_POS_Y1_CHIFFRE,A0
+00000AFA  30BC 01D8                484      MOVE.W      #472,(A0)
+00000AFE                           485  
+00000AFE                           486  **Dessin du background
+00000AFE  7200                     487      MOVE.L      #$00000000,D1
+00000B00  4EB9 00001A4A            488      JSR         SET_PEN_COLOR
+00000B06  223C 00A0A59C            489      MOVE.L      #$00A0A59C,D1
+00000B0C  4EB9 00001A52            490      JSR         SET_FILL_COLOR
+00000B12  323C 0005                491      MOVE.W      #5,D1
+00000B16  343C 0005                492      MOVE.W      #5,D2
+00000B1A  363C 0497                493      MOVE.W      #1175,D3
+00000B1E  383C 0307                494      MOVE.W      #775,D4
+00000B22  4EB9 00001A82            495      JSR         DRAW_FILL_RECT
+00000B28                           496    
+00000B28                           497  **Dessin du bouton de vérification  
+00000B28  223C 006C6C6C            498      MOVE.L      #$006C6C6C,D1
+00000B2E  4EB9 00001A52            499      JSR         SET_FILL_COLOR
+00000B34  323C 02A8                500      MOVE.W      #680,D1                
+00000B38  343C 024E                501      MOVE.W      #590,D2                 
+00000B3C  363C 0366                502      MOVE.W      #870,D3                 
+00000B40  383C 02A8                503      MOVE.W      #680,D4
+00000B44  4EB9 00001A82            504      JSR         DRAW_FILL_RECT
+00000B4A                           505      
+00000B4A                           506  **Dessin des zones d'affichage du nombre de pions bien placés et bon mais mal placés
+00000B4A  323C 0023                507      MOVE.W      #35,D1
+00000B4E  343C 01AE                508      MOVE.W      #430,D2
+00000B52  363C 0064                509      MOVE.W      #100,D3
+00000B56  383C 01EF                510      MOVE.W      #495,D4
+00000B5A  4EB9 00001A82            511      JSR         DRAW_FILL_RECT
+00000B60                           512      
+00000B60  323C 0087                513      MOVE.W      #135,D1
+00000B64  343C 01AE                514      MOVE.W      #430,D2
+00000B68  363C 00C8                515      MOVE.W      #200,D3
+00000B6C  383C 01EF                516      MOVE.W      #495,D4
+00000B70  4EB9 00001A82            517      JSR         DRAW_FILL_RECT
+00000B76                           518      
+00000B76  323C 00EB                519      MOVE.W      #235,D1
+00000B7A  343C 01AE                520      MOVE.W      #430,D2
+00000B7E  363C 012C                521      MOVE.W      #300,D3
+00000B82  383C 01EF                522      MOVE.W      #495,D4
+00000B86  4EB9 00001A82            523      JSR         DRAW_FILL_RECT
+00000B8C                           524      
+00000B8C  323C 014F                525      MOVE.W      #335,D1
+00000B90  343C 01AE                526      MOVE.W      #430,D2
+00000B94  363C 0190                527      MOVE.W      #400,D3
+00000B98  383C 01EF                528      MOVE.W      #495,D4
+00000B9C  4EB9 00001A82            529      JSR         DRAW_FILL_RECT
+00000BA2                           530      
+00000BA2  323C 01B3                531      MOVE.W      #435,D1
+00000BA6  343C 01AE                532      MOVE.W      #430,D2
+00000BAA  363C 01F4                533      MOVE.W      #500,D3
+00000BAE  383C 01EF                534      MOVE.W      #495,D4
+00000BB2  4EB9 00001A82            535      JSR         DRAW_FILL_RECT
+00000BB8                           536          
+00000BB8  323C 0217                537      MOVE.W      #535,D1
+00000BBC  343C 01AE                538      MOVE.W      #430,D2
+00000BC0  363C 0258                539      MOVE.W      #600,D3
+00000BC4  383C 01EF                540      MOVE.W      #495,D4
+00000BC8  4EB9 00001A82            541      JSR         DRAW_FILL_RECT
+00000BCE                           542          
+00000BCE  323C 027B                543      MOVE.W      #635,D1
+00000BD2  343C 01AE                544      MOVE.W      #430,D2
+00000BD6  363C 02BC                545      MOVE.W      #700,D3
+00000BDA  383C 01EF                546      MOVE.W      #495,D4
+00000BDE  4EB9 00001A82            547      JSR         DRAW_FILL_RECT
+00000BE4                           548          
+00000BE4  323C 02DF                549      MOVE.W      #735,D1
+00000BE8  343C 01AE                550      MOVE.W      #430,D2
+00000BEC  363C 0320                551      MOVE.W      #800,D3
+00000BF0  383C 01EF                552      MOVE.W      #495,D4
+00000BF4  4EB9 00001A82            553      JSR         DRAW_FILL_RECT
+00000BFA                           554  
+00000BFA  323C 0343                555      MOVE.W      #835,D1
+00000BFE  343C 01AE                556      MOVE.W      #430,D2
+00000C02  363C 0384                557      MOVE.W      #900,D3
+00000C06  383C 01EF                558      MOVE.W      #495,D4
+00000C0A  4EB9 00001A82            559      JSR         DRAW_FILL_RECT
+00000C10                           560      
+00000C10  323C 03A7                561      MOVE.W      #935,D1
+00000C14  343C 01AE                562      MOVE.W      #430,D2
+00000C18  363C 03E8                563      MOVE.W      #1000,D3
+00000C1C  383C 01EF                564      MOVE.W      #495,D4
+00000C20  4EB9 00001A82            565      JSR         DRAW_FILL_RECT
+00000C26                           566  
+00000C26                           567  **Dessin du texte dans le bouton Verification
+00000C26  227C 00001CE0            568      MOVE.L      #TEST,A1
+00000C2C  223C 00FFFFFF            569      MOVE.L      #$00FFFFFF,D1
+00000C32  243C 03300000            570      MOVE.L      #$03300000,D2
+00000C38  103C 0015                571      MOVE.B      #21,D0
+00000C3C  4E4F                     572      TRAP        #15
+00000C3E  323C 02BC                573      MOVE.W      #700,D1
+00000C42  343C 0258                574      MOVE.W      #600,D2
+00000C46  4EB9 00001A9A            575      JSR         DRAW_STRING
+00000C4C                           576      
+00000C4C                           577  **Dessin des rectangles de couleurs choisies
+00000C4C  323C 0023                578      MOVE.W      #35,D1
+00000C50  343C 0019                579      MOVE.W      #25,D2
+00000C54  363C 0064                580      MOVE.W      #100,D3
+00000C58  383C 0190                581      MOVE.W      #400,D4
+00000C5C  4EB9 00001A82            582      JSR         DRAW_FILL_RECT
+00000C62                           583      
+00000C62  323C 0087                584      MOVE.W      #135,D1
+00000C66  343C 0019                585      MOVE.W      #25,D2
+00000C6A  363C 00C8                586      MOVE.W      #200,D3
+00000C6E  383C 0190                587      MOVE.W      #400,D4
+00000C72  4EB9 00001A82            588      JSR         DRAW_FILL_RECT
+00000C78                           589      
+00000C78  323C 00EB                590      MOVE.W      #235,D1
+00000C7C  343C 0019                591      MOVE.W      #25,D2
+00000C80  363C 012C                592      MOVE.W      #300,D3
+00000C84  383C 0190                593      MOVE.W      #400,D4
+00000C88  4EB9 00001A82            594      JSR         DRAW_FILL_RECT
+00000C8E                           595      
+00000C8E  323C 014F                596      MOVE.W      #335,D1
+00000C92  343C 0019                597      MOVE.W      #25,D2
+00000C96  363C 0190                598      MOVE.W      #400,D3
+00000C9A  383C 0190                599      MOVE.W      #400,D4
+00000C9E  4EB9 00001A82            600      JSR         DRAW_FILL_RECT
+00000CA4                           601      
+00000CA4  323C 01B3                602      MOVE.W      #435,D1
+00000CA8  343C 0019                603      MOVE.W      #25,D2
+00000CAC  363C 01F4                604      MOVE.W      #500,D3
+00000CB0  383C 0190                605      MOVE.W      #400,D4
+00000CB4  4EB9 00001A82            606      JSR         DRAW_FILL_RECT
+00000CBA                           607      
+00000CBA  323C 0217                608      MOVE.W      #535,D1
+00000CBE  343C 0019                609      MOVE.W      #25,D2
+00000CC2  363C 0258                610      MOVE.W      #600,D3
+00000CC6  383C 0190                611      MOVE.W      #400,D4
+00000CCA  4EB9 00001A82            612      JSR         DRAW_FILL_RECT
+00000CD0                           613      
+00000CD0  323C 027B                614      MOVE.W      #635,D1
+00000CD4  343C 0019                615      MOVE.W      #25,D2
+00000CD8  363C 02BC                616      MOVE.W      #700,D3
+00000CDC  383C 0190                617      MOVE.W      #400,D4
+00000CE0  4EB9 00001A82            618      JSR         DRAW_FILL_RECT
+00000CE6                           619      
+00000CE6  323C 02DF                620      MOVE.W      #735,D1
+00000CEA  343C 0019                621      MOVE.W      #25,D2
+00000CEE  363C 0320                622      MOVE.W      #800,D3
+00000CF2  383C 0190                623      MOVE.W      #400,D4
+00000CF6  4EB9 00001A82            624      JSR         DRAW_FILL_RECT
+00000CFC                           625      
+00000CFC  323C 0343                626      MOVE.W      #835,D1
+00000D00  343C 0019                627      MOVE.W      #25,D2
+00000D04  363C 0384                628      MOVE.W      #900,D3
+00000D08  383C 0190                629      MOVE.W      #400,D4
+00000D0C  4EB9 00001A82            630      JSR         DRAW_FILL_RECT
+00000D12                           631      
+00000D12  323C 03A7                632      MOVE.W      #935,D1
+00000D16  343C 0019                633      MOVE.W      #25,D2
+00000D1A  363C 03E8                634      MOVE.W      #1000,D3
+00000D1E  383C 0190                635      MOVE.W      #400,D4
+00000D22  4EB9 00001A82            636      JSR         DRAW_FILL_RECT   
+00000D28                           637  
+00000D28                           638  ** Dessin des rectangles des couleurs machines qui s'affichent à la fin de la partie (rectangle vertical à droite)
+00000D28  323C 043D                639      MOVE.W      #1085,D1
+00000D2C  343C 0019                640      MOVE.W      #25,D2
+00000D30  363C 047E                641      MOVE.W      #1150,D3
+00000D34  383C 0190                642      MOVE.W      #400,D4
+00000D38  4EB9 00001A82            643      JSR         DRAW_FILL_RECT 
+00000D3E                           644   
+00000D3E                           645  **Dessins des petits carrés dans les rectangles de couleurs choisies par l'utilisateur
+00000D3E  323C 002B                646      MOVE.W      #43,D1
+00000D42  343C 0025                647      MOVE.W      #37,D2
+00000D46  363C 005D                648      MOVE.W      #93,D3
+00000D4A  383C 0057                649      MOVE.W      #87,D4
+00000D4E  4EB9 00001A82            650      JSR         DRAW_FILL_RECT
+00000D54  0642 004B                651      ADD.W       #75,D2
+00000D58  0644 004B                652      ADD.W       #75,D4
+00000D5C  4EB9 00001A82            653      JSR         DRAW_FILL_RECT 
+00000D62  0642 004B                654      ADD.W       #75,D2
+00000D66  0644 004B                655      ADD.W       #75,D4
+00000D6A  4EB9 00001A82            656      JSR         DRAW_FILL_RECT
+00000D70  0642 004B                657      ADD.W       #75,D2
+00000D74  0644 004B                658      ADD.W       #75,D4
+00000D78  4EB9 00001A82            659      JSR         DRAW_FILL_RECT
+00000D7E  0642 004B                660      ADD.W       #75,D2
+00000D82  0644 004B                661      ADD.W       #75,D4
+00000D86  4EB9 00001A82            662      JSR         DRAW_FILL_RECT
+00000D8C                           663  
+00000D8C  323C 008F                664      MOVE.W      #143,D1
+00000D90  343C 0025                665      MOVE.W      #37,D2
+00000D94  363C 00C1                666      MOVE.W      #193,D3
+00000D98  383C 0057                667      MOVE.W      #87,D4
+00000D9C  4EB9 00001A82            668      JSR         DRAW_FILL_RECT
+00000DA2  0642 004B                669      ADD.W       #75,D2
+00000DA6  0644 004B                670      ADD.W       #75,D4
+00000DAA  4EB9 00001A82            671      JSR         DRAW_FILL_RECT 
+00000DB0  0642 004B                672      ADD.W       #75,D2
+00000DB4  0644 004B                673      ADD.W       #75,D4
+00000DB8  4EB9 00001A82            674      JSR         DRAW_FILL_RECT
+00000DBE  0642 004B                675      ADD.W       #75,D2
+00000DC2  0644 004B                676      ADD.W       #75,D4
+00000DC6  4EB9 00001A82            677      JSR         DRAW_FILL_RECT
+00000DCC  0642 004B                678      ADD.W       #75,D2
+00000DD0  0644 004B                679      ADD.W       #75,D4
+00000DD4  4EB9 00001A82            680      JSR         DRAW_FILL_RECT
+00000DDA                           681      
+00000DDA  323C 00F3                682      MOVE.W      #243,D1
+00000DDE  343C 0025                683      MOVE.W      #37,D2
+00000DE2  363C 0125                684      MOVE.W      #293,D3
+00000DE6  383C 0057                685      MOVE.W      #87,D4
+00000DEA  4EB9 00001A82            686      JSR         DRAW_FILL_RECT
+00000DF0  0642 004B                687      ADD.W       #75,D2
+00000DF4  0644 004B                688      ADD.W       #75,D4
+00000DF8  4EB9 00001A82            689      JSR         DRAW_FILL_RECT 
+00000DFE  0642 004B                690      ADD.W       #75,D2
+00000E02  0644 004B                691      ADD.W       #75,D4
+00000E06  4EB9 00001A82            692      JSR         DRAW_FILL_RECT
+00000E0C  0642 004B                693      ADD.W       #75,D2
+00000E10  0644 004B                694      ADD.W       #75,D4
+00000E14  4EB9 00001A82            695      JSR         DRAW_FILL_RECT
+00000E1A  0642 004B                696      ADD.W       #75,D2
+00000E1E  0644 004B                697      ADD.W       #75,D4
+00000E22  4EB9 00001A82            698      JSR         DRAW_FILL_RECT
+00000E28                           699      
+00000E28  323C 0157                700      MOVE.W      #343,D1
+00000E2C  343C 0025                701      MOVE.W      #37,D2
+00000E30  363C 0189                702      MOVE.W      #393,D3
+00000E34  383C 0057                703      MOVE.W      #87,D4
+00000E38  4EB9 00001A82            704      JSR         DRAW_FILL_RECT
+00000E3E  0642 004B                705      ADD.W       #75,D2
+00000E42  0644 004B                706      ADD.W       #75,D4
+00000E46  4EB9 00001A82            707      JSR         DRAW_FILL_RECT 
+00000E4C  0642 004B                708      ADD.W       #75,D2
+00000E50  0644 004B                709      ADD.W       #75,D4
+00000E54  4EB9 00001A82            710      JSR         DRAW_FILL_RECT
+00000E5A  0642 004B                711      ADD.W       #75,D2
+00000E5E  0644 004B                712      ADD.W       #75,D4
+00000E62  4EB9 00001A82            713      JSR         DRAW_FILL_RECT
+00000E68  0642 004B                714      ADD.W       #75,D2
+00000E6C  0644 004B                715      ADD.W       #75,D4
+00000E70  4EB9 00001A82            716      JSR         DRAW_FILL_RECT
+00000E76                           717      
+00000E76  323C 01BB                718      MOVE.W      #443,D1
+00000E7A  343C 0025                719      MOVE.W      #37,D2
+00000E7E  363C 01ED                720      MOVE.W      #493,D3
+00000E82  383C 0057                721      MOVE.W      #87,D4
+00000E86  4EB9 00001A82            722      JSR         DRAW_FILL_RECT
+00000E8C  0642 004B                723      ADD.W       #75,D2
+00000E90  0644 004B                724      ADD.W       #75,D4
+00000E94  4EB9 00001A82            725      JSR         DRAW_FILL_RECT 
+00000E9A  0642 004B                726      ADD.W       #75,D2
+00000E9E  0644 004B                727      ADD.W       #75,D4
+00000EA2  4EB9 00001A82            728      JSR         DRAW_FILL_RECT
+00000EA8  0642 004B                729      ADD.W       #75,D2
+00000EAC  0644 004B                730      ADD.W       #75,D4
+00000EB0  4EB9 00001A82            731      JSR         DRAW_FILL_RECT
+00000EB6  0642 004B                732      ADD.W       #75,D2
+00000EBA  0644 004B                733      ADD.W       #75,D4
+00000EBE  4EB9 00001A82            734      JSR         DRAW_FILL_RECT
+00000EC4                           735      
+00000EC4  323C 021F                736      MOVE.W      #543,D1
+00000EC8  343C 0025                737      MOVE.W      #37,D2
+00000ECC  363C 0251                738      MOVE.W      #593,D3
+00000ED0  383C 0057                739      MOVE.W      #87,D4
+00000ED4  4EB9 00001A82            740      JSR         DRAW_FILL_RECT
+00000EDA  0642 004B                741      ADD.W       #75,D2
+00000EDE  0644 004B                742      ADD.W       #75,D4
+00000EE2  4EB9 00001A82            743      JSR         DRAW_FILL_RECT 
+00000EE8  0642 004B                744      ADD.W       #75,D2
+00000EEC  0644 004B                745      ADD.W       #75,D4
+00000EF0  4EB9 00001A82            746      JSR         DRAW_FILL_RECT
+00000EF6  0642 004B                747      ADD.W       #75,D2
+00000EFA  0644 004B                748      ADD.W       #75,D4
+00000EFE  4EB9 00001A82            749      JSR         DRAW_FILL_RECT
+00000F04  0642 004B                750      ADD.W       #75,D2
+00000F08  0644 004B                751      ADD.W       #75,D4
+00000F0C  4EB9 00001A82            752      JSR         DRAW_FILL_RECT
+00000F12                           753      
+00000F12  323C 0283                754      MOVE.W      #643,D1
+00000F16  343C 0025                755      MOVE.W      #37,D2
+00000F1A  363C 02B5                756      MOVE.W      #693,D3
+00000F1E  383C 0057                757      MOVE.W      #87,D4
+00000F22  4EB9 00001A82            758      JSR         DRAW_FILL_RECT
+00000F28  0642 004B                759      ADD.W       #75,D2
+00000F2C  0644 004B                760      ADD.W       #75,D4
+00000F30  4EB9 00001A82            761      JSR         DRAW_FILL_RECT 
+00000F36  0642 004B                762      ADD.W       #75,D2
+00000F3A  0644 004B                763      ADD.W       #75,D4
+00000F3E  4EB9 00001A82            764      JSR         DRAW_FILL_RECT
+00000F44  0642 004B                765      ADD.W       #75,D2
+00000F48  0644 004B                766      ADD.W       #75,D4
+00000F4C  4EB9 00001A82            767      JSR         DRAW_FILL_RECT
+00000F52  0642 004B                768      ADD.W       #75,D2
+00000F56  0644 004B                769      ADD.W       #75,D4
+00000F5A  4EB9 00001A82            770      JSR         DRAW_FILL_RECT
+00000F60                           771      
+00000F60  323C 02E7                772      MOVE.W      #743,D1
+00000F64  343C 0025                773      MOVE.W      #37,D2
+00000F68  363C 0319                774      MOVE.W      #793,D3
+00000F6C  383C 0057                775      MOVE.W      #87,D4
+00000F70  4EB9 00001A82            776      JSR         DRAW_FILL_RECT
+00000F76  0642 004B                777      ADD.W       #75,D2
+00000F7A  0644 004B                778      ADD.W       #75,D4
+00000F7E  4EB9 00001A82            779      JSR         DRAW_FILL_RECT 
+00000F84  0642 004B                780      ADD.W       #75,D2
+00000F88  0644 004B                781      ADD.W       #75,D4
+00000F8C  4EB9 00001A82            782      JSR         DRAW_FILL_RECT
+00000F92  0642 004B                783      ADD.W       #75,D2
+00000F96  0644 004B                784      ADD.W       #75,D4
+00000F9A  4EB9 00001A82            785      JSR         DRAW_FILL_RECT
+00000FA0  0642 004B                786      ADD.W       #75,D2
+00000FA4  0644 004B                787      ADD.W       #75,D4
+00000FA8  4EB9 00001A82            788      JSR         DRAW_FILL_RECT
+00000FAE                           789      
+00000FAE  323C 034B                790      MOVE.W      #843,D1
+00000FB2  343C 0025                791      MOVE.W      #37,D2
+00000FB6  363C 037D                792      MOVE.W      #893,D3
+00000FBA  383C 0057                793      MOVE.W      #87,D4
+00000FBE  4EB9 00001A82            794      JSR         DRAW_FILL_RECT
+00000FC4  0642 004B                795      ADD.W       #75,D2
+00000FC8  0644 004B                796      ADD.W       #75,D4
+00000FCC  4EB9 00001A82            797      JSR         DRAW_FILL_RECT 
+00000FD2  0642 004B                798      ADD.W       #75,D2
+00000FD6  0644 004B                799      ADD.W       #75,D4
+00000FDA  4EB9 00001A82            800      JSR         DRAW_FILL_RECT
+00000FE0  0642 004B                801      ADD.W       #75,D2
+00000FE4  0644 004B                802      ADD.W       #75,D4
+00000FE8  4EB9 00001A82            803      JSR         DRAW_FILL_RECT
+00000FEE  0642 004B                804      ADD.W       #75,D2
+00000FF2  0644 004B                805      ADD.W       #75,D4
+00000FF6  4EB9 00001A82            806      JSR         DRAW_FILL_RECT
+00000FFC                           807      
+00000FFC  323C 03AF                808      MOVE.W      #943,D1
+00001000  343C 0025                809      MOVE.W      #37,D2
+00001004  363C 03E1                810      MOVE.W      #993,D3
+00001008  383C 0057                811      MOVE.W      #87,D4
+0000100C  4EB9 00001A82            812      JSR         DRAW_FILL_RECT
+00001012  0642 004B                813      ADD.W       #75,D2
+00001016  0644 004B                814      ADD.W       #75,D4
+0000101A  4EB9 00001A82            815      JSR         DRAW_FILL_RECT 
+00001020  0642 004B                816      ADD.W       #75,D2
+00001024  0644 004B                817      ADD.W       #75,D4
+00001028  4EB9 00001A82            818      JSR         DRAW_FILL_RECT
+0000102E  0642 004B                819      ADD.W       #75,D2
+00001032  0644 004B                820      ADD.W       #75,D4
+00001036  4EB9 00001A82            821      JSR         DRAW_FILL_RECT
+0000103C  0642 004B                822      ADD.W       #75,D2
+00001040  0644 004B                823      ADD.W       #75,D4
+00001044  4EB9 00001A82            824      JSR         DRAW_FILL_RECT
+0000104A                           825      
+0000104A  323C 0445                826      MOVE.W      #1093,D1
+0000104E  343C 0025                827      MOVE.W      #37,D2
+00001052  363C 0477                828      MOVE.W      #1143,D3
+00001056  383C 0057                829      MOVE.W      #87,D4
+0000105A  4EB9 00001A82            830      JSR         DRAW_FILL_RECT
+00001060  0642 004B                831      ADD.W       #75,D2
+00001064  0644 004B                832      ADD.W       #75,D4
+00001068  4EB9 00001A82            833      JSR         DRAW_FILL_RECT 
+0000106E  0642 004B                834      ADD.W       #75,D2
+00001072  0644 004B                835      ADD.W       #75,D4
+00001076  4EB9 00001A82            836      JSR         DRAW_FILL_RECT
+0000107C  0642 004B                837      ADD.W       #75,D2
+00001080  0644 004B                838      ADD.W       #75,D4
+00001084  4EB9 00001A82            839      JSR         DRAW_FILL_RECT
+0000108A  0642 004B                840      ADD.W       #75,D2
+0000108E  0644 004B                841      ADD.W       #75,D4
+00001092  4EB9 00001A82            842      JSR         DRAW_FILL_RECT
+00001098                           843      
+00001098                           844  **Dessin des "?" dans les cases de la machine
+00001098  227C 00001AB1            845      MOVE.L      #POINT_INTERR,A1
+0000109E  223C 00FFFFFF            846      MOVE.L      #$FFFFFF,D1
+000010A4  243C 03200000            847      MOVE.L      #$03200000,D2
+000010AA  103C 0015                848      MOVE.B      #21,D0
+000010AE  4E4F                     849      TRAP        #15
+000010B0  323C 0451                850      MOVE.W      #1105,D1
+000010B4  343C 0028                851      MOVE.W      #40,D2
+000010B8  4EB9 00001A9A            852      JSR         DRAW_STRING
+000010BE  0642 004B                853      ADD.W       #75,D2
+000010C2  4EB9 00001A9A            854      JSR         DRAW_STRING
+000010C8  0642 004B                855      ADD.W       #75,D2
+000010CC  4EB9 00001A9A            856      JSR         DRAW_STRING
+000010D2  0642 004B                857      ADD.W       #75,D2
+000010D6  4EB9 00001A9A            858      JSR         DRAW_STRING
+000010DC  0642 004B                859      ADD.W       #75,D2
+000010E0  4EB9 00001A9A            860      JSR         DRAW_STRING
+000010E6                           861      
+000010E6                           862  **Dessin du rectangle des couleurs cliquables
+000010E6  323C 00FA                863      MOVE.W      #250,D1
+000010EA  343C 0230                864      MOVE.W      #560,D2
+000010EE  363C 028A                865      MOVE.W      #650,D3
+000010F2  383C 02E4                866      MOVE.W      #740,D4
+000010F6  4EB9 00001A82            867      JSR         DRAW_FILL_RECT
+000010FC                           868  
+000010FC                           869  **Dessin des carrés de couleurs cliquables
+000010FC  223C 00EC5A07            870      MOVE.L      #$00EC5A07,D1          
+00001102  4EB9 00001A4A            871      JSR         SET_PEN_COLOR          
+00001108  223C 00EC5A07            872      MOVE.L      #$00EC5A07,D1           
+0000110E  4EB9 00001A52            873      JSR         SET_FILL_COLOR         
+00001114  323C 0113                874      MOVE.W      #275,D1                 
+00001118  343C 0249                875      MOVE.W      #585,D2                 
+0000111C  363C 0145                876      MOVE.W      #325,D3                
+00001120  383C 027B                877      MOVE.W      #635,D4             
+00001124  4EB9 00001A82            878      JSR         DRAW_FILL_RECT          
+0000112A                           879      
+0000112A  223C 0047F2FF            880      MOVE.L      #$0047F2FF,D1          
+00001130  4EB9 00001A4A            881      JSR         SET_PEN_COLOR          
+00001136  223C 0047F2FF            882      MOVE.L      #$0047F2FF,D1           
+0000113C  4EB9 00001A52            883      JSR         SET_FILL_COLOR          
+00001142  323C 0177                884      MOVE.W      #375,D1                 
+00001146  343C 0249                885      MOVE.W      #585,D2                 
+0000114A  363C 01A9                886      MOVE.W      #425,D3                 
+0000114E  383C 027B                887      MOVE.W      #635,D4                 
+00001152  4EB9 00001A82            888      JSR         DRAW_FILL_RECT          
+00001158                           889      
+00001158  223C 006DDD43            890      MOVE.L      #$006DDD43,D1           
+0000115E  4EB9 00001A4A            891      JSR         SET_PEN_COLOR           
+00001164  223C 006DDD43            892      MOVE.L      #$006DDD43,D1          
+0000116A  4EB9 00001A52            893      JSR         SET_FILL_COLOR          
+00001170  323C 01DB                894      MOVE.W      #475,D1                
+00001174  343C 0249                895      MOVE.W      #585,D2                 
+00001178  363C 020D                896      MOVE.W      #525,D3                 
+0000117C  383C 027B                897      MOVE.W      #635,D4                
+00001180  4EB9 00001A82            898      JSR         DRAW_FILL_RECT          
+00001186                           899  
+00001186  223C 000607E7            900      MOVE.L      #$000607E7,D1          
+0000118C  4EB9 00001A4A            901      JSR         SET_PEN_COLOR    
+00001192  223C 000607E7            902      MOVE.L      #$000607E7,D1           
+00001198  4EB9 00001A52            903      JSR         SET_FILL_COLOR          
+0000119E  323C 023F                904      MOVE.W      #575,D1                 
+000011A2  343C 0249                905      MOVE.W      #585,D2                 
+000011A6  363C 0271                906      MOVE.W      #625,D3                 
+000011AA  383C 027B                907      MOVE.W      #635,D4                
+000011AE  4EB9 00001A82            908      JSR         DRAW_FILL_RECT          
+000011B4                           909  
+000011B4  223C 00FF3881            910      MOVE.L      #$00FF3881,D1           
+000011BA  4EB9 00001A4A            911      JSR         SET_PEN_COLOR           
+000011C0  223C 00FF3881            912      MOVE.L      #$00FF3881,D1        
+000011C6  4EB9 00001A52            913      JSR         SET_FILL_COLOR         
+000011CC  323C 0113                914      MOVE.W      #275,D1                 
+000011D0  343C 029E                915      MOVE.W      #670,D2                 
+000011D4  363C 0145                916      MOVE.W      #325,D3                 
+000011D8  383C 02D0                917      MOVE.W      #720,D4                 
+000011DC  4EB9 00001A82            918      JSR         DRAW_FILL_RECT          
+000011E2                           919  
+000011E2  223C 00154CFB            920      MOVE.L      #$00154CFB,D1           
+000011E8  4EB9 00001A4A            921      JSR         SET_PEN_COLOR           
+000011EE  223C 00154CFB            922      MOVE.L      #$00154CFB,D1           
+000011F4  4EB9 00001A52            923      JSR         SET_FILL_COLOR         
+000011FA  323C 0177                924      MOVE.W      #375,D1              
+000011FE  343C 029E                925      MOVE.W      #670,D2            
+00001202  363C 01A9                926      MOVE.W      #425,D3                
+00001206  383C 02D0                927      MOVE.W      #720,D4                 
+0000120A  4EB9 00001A82            928      JSR         DRAW_FILL_RECT          
+00001210                           929  
+00001210  223C 00DD32EE            930      MOVE.L      #$00DD32EE,D1          
+00001216  4EB9 00001A4A            931      JSR         SET_PEN_COLOR          
+0000121C  223C 00DD32EE            932      MOVE.L      #$00DD32EE,D1        
+00001222  4EB9 00001A52            933      JSR         SET_FILL_COLOR     
+00001228  323C 01DB                934      MOVE.W      #475,D1             
+0000122C  343C 029E                935      MOVE.W      #670,D2            
+00001230  363C 020D                936      MOVE.W      #525,D3            
+00001234  383C 02D0                937      MOVE.W      #720,D4            
+00001238  4EB9 00001A82            938      JSR         DRAW_FILL_RECT        
+0000123E                           939  
+0000123E  223C 00183C90            940      MOVE.L      #$00183C90,D1          
+00001244  4EB9 00001A4A            941      JSR         SET_PEN_COLOR     
+0000124A  223C 00183C90            942      MOVE.L      #$00183C90,D1        
+00001250  4EB9 00001A52            943      JSR         SET_FILL_COLOR      
+00001256  323C 023F                944      MOVE.W      #575,D1                
+0000125A  343C 029E                945      MOVE.W      #670,D2                
+0000125E  363C 0271                946      MOVE.W      #625,D3              
+00001262  383C 02D0                947      MOVE.W      #720,D4               
+00001266  4EB9 00001A82            948      JSR         DRAW_FILL_RECT         
+0000126C                           949  
+0000126C                           950  
+0000126C  143C 0000                951      MOVE.B      #0,D2                   ; Compteur de chiffres choisis par la machine
+00001270  207C 00001AA2            952      MOVE.L      #COLOR_MACHINE,A0       ; récupère l'adresse de COLOR_MACHINE dans A0
+00001276                           953     
+00001276                           954  * Génération des couleurs par la machine
+00001276                           955  * On commence par générer une première fois à l'aide du temps machine, puis on utilise l'algorithme.
+00001276  103C 0008                956      MOVE.B      #8,D0                   ; Récupère le temps système (horloge) dans D1
+0000127A  4E4F                     957      TRAP        #15
+0000127C  C2BC 0005FFFF            958      AND.L       #$5FFFF,D1              ; Prévention de la division par 8
+00001282  82FC 0008                959      DIVU        #8,D1                   ; Division par 8
+00001286  2801                     960      MOVE.L      D1,D4                   ; Récupère la division et le reste dans D4
+00001288  4844                     961      SWAP        D4                      ; Inversion des 2 octets de poids faible avec les deux octets de poids fort
+0000128A  1604                     962      MOVE.B      D4,D3                   ; Déplacement du résultat du reste de la division dans D3
+0000128C  10C3                     963      MOVE.B      D3,(A0)+                ; Stock de la couleur dans le premier tirage
+0000128E                           964  POUR_CHOIX_COULEUR:
+0000128E  B43C 0004                965      CMP.B       #4,D2                   ; Compare si on a fini de sélectionner les 5 couleurs
+00001292  6700 000E                966      BEQ         FIN_POUR_CHOIX          ; Si égal, on a fini
+00001296  4EB9 00001818            967      JSR         Randomize               ; Sinon on va dans Randomize
+0000129C  10C3                     968      MOVE.B      D3,(A0)+                ; Randomize renvoie la valeur suivante dans D3, donc on l'ajoute dans COLOR_MACHINE
+0000129E  5202                     969      ADD.B       #1,D2                   ; On incrémente le compteur      
+000012A0  60EC                     970      BRA         POUR_CHOIX_COULEUR      ; On revient au début de la boucle
+000012A2                           971  FIN_POUR_CHOIX: 
+000012A2                           972      
+000012A2  1C3C 0000                973      MOVE.B      #0,D6                   ; D6 Contient le nombre de couleurs choisies par l'utilisateur
+000012A6  1A3C 0000                974      MOVE.B      #0,D5                   ; D6 Contient le nombre de tentatives réalisées au total
+000012AA                           975  ; Clic des carrés en bas
+000012AA                           976  BOUCLE_POUR_VERIF:
+000012AA  BA3C 000A                977      CMP.B       #10,D5                  ; Au bout de 10 coups, l'utilisateur a perdu
+000012AE  6700 0396                978      BEQ         LOOSE
+000012B2  227C 00001AAC            979      MOVE.L      #COLOR_USER,A1          ; Si le joueur n'a pas fait 10 coups, on stock l'adresse du début du tableau de COLOR_USER dans A1
+000012B8                           980  BOUCLE_CHOIX_COULEUR_USER:
+000012B8  BC3C 0005                981      CMP.B       #5,D6                   ; Si le joueur a choisi 5 couleurs, on va à FIN_CHOIX
+000012BC  6700 025C                982      BEQ         FIN_CHOIX
+000012C0  7600                     983      MOVE.L      #0,D3                   ; coordonnée X du clic souris à 0
+000012C2  7800                     984      MOVE.L      #0,D4                   ; coordonnée Y du clic souris à 0
+000012C4                           985  CLIC_SOURIS:    
+000012C4  7200                     986      MOVE.L      #0,D1                   ; Déplacement de 0 dans D1 afin de récupérer
+000012C6  4EB9 00001A42            987      JSR         GET_MOUSE               ; On utilise GET_MOUSE (Stock dans D0.B, les informations du clic, dans D1.L et la position de la souris (16 bits Y, 16 bits X))
+000012CC  B03C 0001                988      CMP.B       #1,D0                   ; On test si le clic gauche est pressé
+000012D0  66F2                     989      BNE         CLIC_SOURIS             ; Si non, on test de nouveau
+000012D2                           990  RELACHE_CLIC:
+000012D2  7200                     991      MOVE.L      #0,D1                   ; On remet D1 à 0 pour retester un clic souris
+000012D4  4EB9 00001A42            992      JSR         GET_MOUSE               ; On récupère les informations du clic et la position
+000012DA  B03C 0000                993      CMP.B       #0,D0                   ; Si le clic gauche est relâché, on regarde où le clic est
+000012DE  66F2                     994      BNE         RELACHE_CLIC            ; Si non, on retest le relâchement du clic
+000012E0                           995  FIN_BOUCLE_CLIC:                        ; Si le clic est gauche est relâché
+000012E0  3601                     996      MOVE.W      D1,D3                   ; On déplace les coordonnées X dans D3
+000012E2  4841                     997      SWAP        D1                      ; On inverse les deux octets de poids faible avec ceux de poids fort pour sauvegarder les coordonnées Y
+000012E4  3801                     998      MOVE.W      D1,D4                   ; On déplace les coordonées Y dans D4
+000012E6                           999      
+000012E6                          1000      
+000012E6                          1001  TEST_CARRE_BLEU:                        ; On test le clic dans le carré bleu
+000012E6  B67C 0113               1002      CMP.W       #275,D3                 ; x > 275
+000012EA  6A00 0004               1003      BPL         SUITE_CARRE_BLEU_XM     ; Si oui, on continue
+000012EE  60D4                    1004      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+000012F0                          1005  SUITE_CARRE_BLEU_XM:                    
+000012F0  B67C 0145               1006      CMP.W       #325,D3                 ; x < 325
+000012F4  6B00 0006               1007      BMI         SUITE_CARRE_BLEU_YP     ; Si oui, on continue
+000012F8  6000 0028               1008      BRA         TEST_CARRE_JAUNE        ; Si x > 325, on test le carré adjacent au bleu (ici, le jaune)
+000012FC                          1009  SUITE_CARRE_BLEU_YP:
+000012FC  B87C 0249               1010      CMP.W       #585,D4                 ; y > 585
+00001300  6A00 0004               1011      BPL         SUITE_CARRE_BLEU_YM     ; Si oui, on continue
+00001304  60BE                    1012      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+00001306                          1013  SUITE_CARRE_BLEU_YM:                    
+00001306  B87C 027B               1014      CMP.W       #635,D4                 ; y > 635
+0000130A  6A00 00D8               1015      BPL         TEST_CARRE_VIOLET       ; Si oui, on test le carré adjacent en dessous au bleu (ici, le violet)
+0000130E                          1016  ; Si non, on place la valeur de la couleur choisie dans le tableau
+0000130E  12FC 0000               1017      MOVE.B      #0,(A1)+                
+00001312  5206                    1018      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+00001314  223C 00EC5A07           1019      MOVE.L      #$00EC5A07,D1           ; On met dans D1 la couleur bleue
+0000131A  4EB9 0000190C           1020      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+00001320                          1021  ; Puis on revient dans la boucle de choix couleur
+00001320  6096                    1022      BRA         BOUCLE_CHOIX_COULEUR_USER
+00001322                          1023      
+00001322                          1024  TEST_CARRE_JAUNE:                       ; On test le clic dans le carré jaune
+00001322  B67C 0177               1025      CMP.W       #375,D3                 ; x > 375
+00001326  6A00 0004               1026      BPL         SUITE_CARRE_JAUNE_XM    ; Si oui, on continue
+0000132A  6098                    1027      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+0000132C                          1028  SUITE_CARRE_JAUNE_XM:
+0000132C  B67C 01A9               1029      CMP.W       #425,D3                 ; x < 425
+00001330  6B00 0006               1030      BMI         SUITE_CARRE_JAUNE_YP    ; Si oui, on continue
+00001334  6000 002A               1031      BRA         TEST_CARRE_VERT         ; Si x > 425, on test le carré adjacent au jaune (ici, le vert)
+00001338                          1032  SUITE_CARRE_JAUNE_YP:   
+00001338  B87C 0249               1033      CMP.W       #585,D4                 ; y > 585
+0000133C  6A00 0004               1034      BPL         SUITE_CARRE_JAUNE_YM    ; Si oui, on continue
+00001340  6082                    1035      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+00001342                          1036  SUITE_CARRE_JAUNE_YM:       
+00001342  B87C 027B               1037      CMP.W       #635,D4                 ; y > 635
+00001346  6A00 00DE               1038      BPL         TEST_CARRE_ORANGE       ; Si oui, on test le carré adjacent en dessous au jaune (ici, le orange)
+0000134A                          1039  ; Si non, on place la valeur de la couleur choisie dans le tableau
+0000134A  12FC 0001               1040      MOVE.B      #1,(A1)+                
+0000134E  5206                    1041      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+00001350  223C 0047F2FF           1042      MOVE.L      #$0047F2FF,D1           ; On met dans D1 la couleur jaune
+00001356  4EB9 0000190C           1043      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+0000135C                          1044  ; Puis on revient dans la boucle de choix couleur
+0000135C  6000 FF5A               1045      BRA         BOUCLE_CHOIX_COULEUR_USER
+00001360                          1046      
+00001360                          1047  TEST_CARRE_VERT:                        ; On test le clic dans le carré vert
+00001360  B67C 01DB               1048      CMP.W       #475,D3                 ; x > 475
+00001364  6A00 0006               1049      BPL         SUITE_CARRE_VERT_XM     ; Si oui, on continue
+00001368  6000 FF5A               1050      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+0000136C                          1051  SUITE_CARRE_VERT_XM:
+0000136C  B67C 020D               1052      CMP.W       #525,D3                 ; y < 525
+00001370  6B00 0006               1053      BMI         SUITE_CARRE_VERT_YP     ; Si oui, on continue
+00001374  6000 002C               1054      BRA         TEST_CARRE_ROUGE        ; Si x > 525, on test le carré adjacent au vert (ici, le rouge)
+00001378                          1055  SUITE_CARRE_VERT_YP:    
+00001378  B87C 0249               1056      CMP.W       #585,D4                 ; y > 585
+0000137C  6A00 0006               1057      BPL         SUITE_CARRE_VERT_YM     ; Si oui, on continue
+00001380  6000 FF42               1058      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+00001384                          1059  SUITE_CARRE_VERT_YM:        
+00001384  B87C 027B               1060      CMP.W       #635,D4                 ; y > 635
+00001388  6A00 00DE               1061      BPL         TEST_CARRE_ROSE         ; Si oui, on test le carré adjacent en dessous au jaune (ici, le orange)
+0000138C                          1062  ; Si non, on place la valeur de la couleur choisie dans le tableau
+0000138C  12FC 0002               1063      MOVE.B      #2,(A1)+                
+00001390  5206                    1064      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+00001392  223C 006DDD43           1065      MOVE.L      #$006DDD43,D1           ; On met dans D1 la couleur verte
+00001398  4EB9 0000190C           1066      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+0000139E                          1067  ; Puis on revient dans la boucle de choix couleur
+0000139E  6000 FF18               1068      BRA         BOUCLE_CHOIX_COULEUR_USER
+000013A2                          1069      
+000013A2                          1070  TEST_CARRE_ROUGE:                       ; On test le clic dans le carré rouge
+000013A2  B67C 023F               1071      CMP.W       #575,D3                 ; x > 575
+000013A6  6A00 0006               1072      BPL         SUITE_CARRE_ROUGE_XM    ; Si oui, on continue
+000013AA  6000 FF18               1073      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+000013AE                          1074  SUITE_CARRE_ROUGE_XM:
+000013AE  B67C 0271               1075      CMP.W       #625,D3                 ; x < 625
+000013B2  6B00 0006               1076      BMI         SUITE_CARRE_ROUGE_YP    ; Si oui, on continue
+000013B6  6000 FF0C               1077      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris (car pas de carré à droite du rouge)
+000013BA                          1078  SUITE_CARRE_ROUGE_YP:       
+000013BA  B87C 0249               1079      CMP.W       #585,D4                 ; y > 585
+000013BE  6A00 0006               1080      BPL         SUITE_CARRE_ROUGE_YM    ; Si oui, on continue
+000013C2  6000 FF00               1081      BRA         CLIC_SOURIS             ; Si non, on retente un clic souris
+000013C6                          1082  SUITE_CARRE_ROUGE_YM:
+000013C6  B87C 027B               1083      CMP.W       #635,D4                 ; y > 635
+000013CA  6A00 00DE               1084      BPL         TEST_CARRE_MARRON       ; Si oui, on test le carré adjacent en dessous au rouge  (ici, le marron)
+000013CE                          1085  ; Si non, on place la valeur de la couleur choisie dans le tableau
+000013CE  12FC 0003               1086      MOVE.B      #3,(A1)+              
+000013D2  5206                    1087      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+000013D4  223C 000607E7           1088      MOVE.L      #$000607E7,D1           ; On met dans D1 la couleur rouge
+000013DA  4EB9 0000190C           1089      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+000013E0                          1090  ; Puis on revient dans la boucle de choix couleur
+000013E0  6000 FED6               1091      BRA         BOUCLE_CHOIX_COULEUR_USER   
+000013E4                          1092      
+000013E4                          1093  TEST_CARRE_VIOLET:                      ; On test le clic dans le carré violet    
+000013E4  B67C 0113               1094      CMP.W       #275,D3                  ; x > 275
+000013E8  6A00 0006               1095      BPL         SUITE_CARRE_VIOLET_XM   ; Si oui, on continue
+000013EC  6000 FED6               1096      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+000013F0                          1097  SUITE_CARRE_VIOLET_XM:
+000013F0  B67C 0145               1098      CMP.W       #325,D3                 ; x < 325
+000013F4  6B00 0006               1099      BMI         SUITE_CARRE_VIOLET_YP   ; Si oui, on continue
+000013F8  6000 FECA               1100      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+000013FC                          1101  SUITE_CARRE_VIOLET_YP:
+000013FC  B87C 029E               1102      CMP.W       #670,D4                 ; y > 670
+00001400  6A00 0006               1103      BPL         SUITE_CARRE_VIOLET_YM   ; Si oui, on continue
+00001404  6000 FEBE               1104      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+00001408                          1105  SUITE_CARRE_VIOLET_YM:
+00001408  B87C 02D0               1106      CMP.W       #720,D4                 ; y > 720
+0000140C  6A00 FEB6               1107      BPL         CLIC_SOURIS             ; Si oui, on retente un clic
+00001410                          1108  ; Si non, on place la valeur de la couleur choisie dans le tableau
+00001410  12FC 0004               1109      MOVE.B      #4,(A1)+               
+00001414  5206                    1110      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+00001416  223C 00FF3881           1111      MOVE.L      #$00FF3881,D1           ; On met dans D1 la couleur violet
+0000141C  4EB9 0000190C           1112      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+00001422                          1113  ; Puis on revient dans la boucle de choix couleur
+00001422  6000 FE94               1114      BRA         BOUCLE_CHOIX_COULEUR_USER
+00001426                          1115      
+00001426                          1116  TEST_CARRE_ORANGE:                      ; On test le clic dans le carré orange
+00001426  B67C 0177               1117      CMP.W       #375,D3                 ; x > 375
+0000142A  6A00 0006               1118      BPL         SUITE_CARRE_ORANGE_XM   ; Si oui, on continue
+0000142E  6000 FE94               1119      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+00001432                          1120  SUITE_CARRE_ORANGE_XM:
+00001432  B67C 01A9               1121      CMP.W       #425,D3                 ; x < 425
+00001436  6B00 0006               1122      BMI         SUITE_CARRE_ORANGE_YP   ; Si oui, on continue
+0000143A  6000 FE88               1123      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+0000143E                          1124  SUITE_CARRE_ORANGE_YP:
+0000143E  B87C 029E               1125      CMP.W       #670,D4                 ; y > 670
+00001442  6A00 0006               1126      BPL         SUITE_CARRE_ORANGE_YM   ; Si oui, on continue
+00001446  6000 FE7C               1127      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+0000144A                          1128  SUITE_CARRE_ORANGE_YM:
+0000144A  B87C 02D0               1129      CMP.W       #720,D4                 ; y > 720
+0000144E  6A00 FE74               1130      BPL         CLIC_SOURIS             ; Si oui, on retente un clic
+00001452                          1131  ; Si non, on place la valeur de la couleur choisie dans le tableau
+00001452  12FC 0005               1132      MOVE.B      #5,(A1)+                 
+00001456  5206                    1133      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+00001458  223C 00154CFB           1134      MOVE.L      #$00154CFB,D1           ; On met dans D1 la couleur orange
+0000145E  4EB9 0000190C           1135      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+00001464                          1136  ; Puis on revient dans la boucle de choix couleur
+00001464  6000 FE52               1137      BRA         BOUCLE_CHOIX_COULEUR_USER
+00001468                          1138      
+00001468                          1139  TEST_CARRE_ROSE:                        ; On test le clic dans le carré rose
+00001468  B67C 01DB               1140      CMP.W       #475,D3                 ; x > 475
+0000146C  6A00 0006               1141      BPL         SUITE_CARRE_ROSE_XM     ; Si oui, on continue
+00001470  6000 FE52               1142      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+00001474                          1143  SUITE_CARRE_ROSE_XM:
+00001474  B67C 020D               1144      CMP.W       #525,D3                 ; x < 525
+00001478  6B00 0006               1145      BMI         SUITE_CARRE_ROSE_YP     ; Si oui, on continue
+0000147C  6000 FE46               1146      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+00001480                          1147  SUITE_CARRE_ROSE_YP:
+00001480  B87C 029E               1148      CMP.W       #670,D4                 ; y > 670
+00001484  6A00 0006               1149      BPL         SUITE_CARRE_ROSE_YM     ; Si oui, on continue
+00001488  6000 FE3A               1150      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+0000148C                          1151  SUITE_CARRE_ROSE_YM:
+0000148C  B87C 02D0               1152      CMP.W       #720,D4                 ; y > 720
+00001490  6A00 FE32               1153      BPL         CLIC_SOURIS             ; Si oui, on retente un clic
+00001494                          1154  ; Si non, on place la valeur de la couleur choisie dans le tableau
+00001494  12FC 0006               1155      MOVE.B      #6,(A1)+                
+00001498  5206                    1156      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+0000149A  223C 00DD32EE           1157      MOVE.L      #$00DD32EE,D1           ; On met dans D1 la couleur rose
+000014A0  4EB9 0000190C           1158      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User
+000014A6                          1159  ; Puis on revient dans la boucle de choix couleur
+000014A6  6000 FE10               1160      BRA BOUCLE_CHOIX_COULEUR_USER
+000014AA                          1161      
+000014AA                          1162  TEST_CARRE_MARRON:                      ; On test le clic dans le carré marron
+000014AA  B67C 023F               1163      CMP.W       #575,D3                 ; x > 575
+000014AE  6A00 0006               1164      BPL         SUITE_CARRE_MARRON_XM   ; Si oui, on continue
+000014B2  6000 FE10               1165      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+000014B6                          1166  SUITE_CARRE_MARRON_XM:
+000014B6  B67C 0271               1167      CMP.W       #625,D3                 ; x < 625
+000014BA  6B00 0006               1168      BMI         SUITE_CARRE_MARRON_YP   ; Si oui, on continue
+000014BE  6000 FE04               1169      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+000014C2                          1170  SUITE_CARRE_MARRON_YP:
+000014C2  B87C 029E               1171      CMP.W       #670,D4                 ; y > 670
+000014C6  6A00 0006               1172      BPL         SUITE_CARRE_MARRON_YM   ; Si oui, on continue
+000014CA  6000 FDF8               1173      BRA         CLIC_SOURIS             ; Si non, on retente un clic
+000014CE                          1174  SUITE_CARRE_MARRON_YM:
+000014CE  B87C 02D0               1175      CMP.W       #720,D4                 ; y > 720
+000014D2  6A00 FDF0               1176      BPL         CLIC_SOURIS             ; Si oui, on retente un clic
+000014D6                          1177  ; Si non, on place la valeur de la couleur choisie dans le tableau
+000014D6  12FC 0007               1178      MOVE.B      #7,(A1)+              
+000014DA  5206                    1179      ADD.B       #1,D6                   ; On ajoute 1 au compteur du nombre de couleurs choisies 
+000014DC  223C 00183C90           1180      MOVE.L      #$00183C90,D1           ; On met dans D1 la couleur marron
+000014E2  4EB9 0000190C           1181      JSR         Dessin_Carre_User       ; On dessine le carré dans les rectangles du haut grâce à Dessin_Carre_User   
+000014E8                          1182  ; Puis on revient dans la boucle de choix couleur               
+000014E8  6000 FDCE               1183      BRA         BOUCLE_CHOIX_COULEUR_USER
+000014EC                          1184     
+000014EC                          1185  ; A la fin de la vérification, on récupère le nombre de pions bien placés et mal placés pour les mettre dans les variables pour les conserver, puis les afficher
+000014EC                          1186  FIN_VERIF:
+000014EC  267C 00001CFA           1187      MOVE.L      #NOMBRE_BIEN_PLACE,A3
+000014F2  287C 00001CFB           1188      MOVE.L      #NOMBRE_MAL_PLACE,A4
+000014F8  1681                    1189      MOVE.B      D1,(A3)
+000014FA  1882                    1190      MOVE.B      D2,(A4)
+000014FC  4EB9 00001948           1191      JSR         Dessin_Pion_Placement
+00001502  267C 00001CFA           1192      MOVE.L      #NOMBRE_BIEN_PLACE,A3
+00001508                          1193  ; On compare le nombre de bien placés avec le caractère '5', et si c'est égal à '5', le joueur a gagné
+00001508  0C13 0035               1194      CMP.B       #53,(A3)
+0000150C  6700 012A               1195      BEQ         WIN
+00001510                          1196  ; Sinon, on revient au début de la boucle
+00001510  1C3C 0000               1197      MOVE.B      #0,D6                   ; On remet le nombre de couleurs choisies à 0
+00001514  5205                    1198      ADD.B       #1,D5                   ; On incrémente le compteur de tentatives
+00001516  6000 FD92               1199      BRA         BOUCLE_POUR_VERIF
+0000151A                          1200  
+0000151A                          1201  FIN_CHOIX:
+0000151A  267C 00001CFC           1202      MOVE.L      #PLACE_POS_X1,A3        ; Récupération des positions de dessin dans les lignes de choix de couleur
+00001520  287C 00001D00           1203      MOVE.L      #PLACE_POS_Y1,A4
+00001526  2A7C 00001CFE           1204      MOVE.L      #PLACE_POS_X2,A5
+0000152C  2C7C 00001D02           1205      MOVE.L      #PLACE_POS_Y2,A6
+00001532  0454 0177               1206      SUB.W       #375,(A4)               ; Retour à la ligne en Y1
+00001536  0456 0177               1207      SUB.W       #375,(A6)               ; Retour à la ligne en Y2
+0000153A  0653 0064               1208      ADD.W       #100,(A3)               ; Passage à la ligne d'à côté en ajoutant 79 en X1
+0000153E  0655 0064               1209      ADD.W       #100,(A5)               ; Passage à la ligne d'à côté en ajoutant 79 en X2
+00001542  227C 00001AAC           1210      MOVE.L      #COLOR_USER,A1          ; On remet l'adresse du tableau COLOR_USER au début
+00001548  6000 0094               1211      BRA         BOUTON_VERIF
+0000154C                          1212      
+0000154C                          1213  BOUCLE_VERIF:
+0000154C  103C 0000               1214      MOVE.B      #0,D0                   ; On utilise D0 comme compteur de couleurs testées
+00001550  207C 00001AA7           1215      MOVE.L      #COLOR_MACHINE_STOCK,A0 ; On récupère les couleurs COLOR_MACHINE_STOCK
+00001556  227C 00001AAC           1216      MOVE.L      #COLOR_USER,A1          ; et les couleurs de l'utilisateur
+0000155C  123C 0000               1217      MOVE.B      #0,D1                   ; On met D1 à 0 car D1 va compter le nombre de couleurs bien placées
+00001560                          1218  BOUCLE_VERIF_BIEN_PLACE:
+00001560  B03C 0005               1219      CMP.B       #5,D0                   ; Si on a testé toutes les couleurs bonnes et bien placées, on passe aux bon et mal placées
+00001564  6700 0022               1220      BEQ         VERIF_BON_MAL_PLACE
+00001568  1810                    1221      MOVE.B      (A0),D4                 ; On déplace dans D4 et D7 les couleurs actuelles
+0000156A  1E11                    1222      MOVE.B      (A1),D7
+0000156C  BE04                    1223      CMP.B       D4,D7                   ; Si les deux couleurs sont égales
+0000156E  6700 0006               1224      BEQ         AJOUT_BIEN_PLACE        ; On va dans AJOUT_BIEN_PLACE
+00001572  6000 000C               1225      BRA         SUITE_BIEN_PLACE        ; Si non, on va dans SUITE_BIEN_PLACE
+00001576                          1226  AJOUT_BIEN_PLACE:   
+00001576  5201                    1227      ADD.B       #1,D1                   ; On incrémente le compteur de couleurs bien placées
+00001578  12BC 00FF               1228      MOVE.B      #$FF,(A1)               ; On met $FF pour éviter de reprendre la couleur plusieurs fois
+0000157C  10BC 00FF               1229      MOVE.B      #$FF,(A0)
+00001580                          1230  SUITE_BIEN_PLACE:
+00001580  5200                    1231      ADD.B       #1,D0                   ; On incrémente le compteur de couleurs testées
+00001582  5288                    1232      ADD.L       #1,A0                   ; On passe à la cellule du tableau suivante dans les deux tableaux
+00001584  5289                    1233      ADD.L       #1,A1
+00001586  60D8                    1234      BRA         BOUCLE_VERIF_BIEN_PLACE
+00001588                          1235      
+00001588                          1236  ; Double boucle POUR
+00001588                          1237  VERIF_BON_MAL_PLACE:
+00001588  103C 0000               1238      MOVE.B      #0,D0                   ; Initialisation du compteur qui va parcourir les couleurs de la machine
+0000158C  163C 0000               1239      MOVE.B      #0,D3                   ; Initialisation du compteur qui va parcourir les couleurs de l'utilisateur
+00001590  143C 0000               1240      MOVE.B      #0,D2                   ; Stocker le nombre de valeurs bonnes et mal placées
+00001594  183C 0000               1241      MOVE.B      #0,D4
+00001598  1E3C 0000               1242      MOVE.B      #0,D7
+0000159C  207C 00001AA7           1243      MOVE.L      #COLOR_MACHINE_STOCK,A0 ; On stock les couleurs de la machine à chaque tour de boucle
+000015A2                          1244  BOUCLE_VERIF_BON_MAL_PLACE:
+000015A2  B03C 0005               1245      CMP.B       #5,D0                   ; On vérifie si on a vérifier chaque couleur de l'utilisateur pour chaque couleur machine stockée
+000015A6  6700 FF44               1246      BEQ         FIN_VERIF
+000015AA  163C 0000               1247      MOVE.B      #0,D3                   ; Si non, on met à 0 le nombre de couleurs de l'utilisateur testées
+000015AE  1818                    1248      MOVE.B      (A0)+,D4                ; On stock dans D4 la couleur de la machine à tester pour toutes les couleurs de l'utilisateur
+000015B0  B83C 00FF               1249      CMP.B       #$FF,D4                 ; Si la couleur est $FF (couleur déjà testée), on ne la prend pas en compte
+000015B4  6700 0024               1250      BEQ         SUITE_COULEUR_MACHINE
+000015B8  227C 00001AAC           1251      MOVE.L      #COLOR_USER,A1          ; Si la couleur n'est pas $FF, on passe la suite
+000015BE                          1252  BOUCLE_COULEUR_USER:
+000015BE  B63C 0005               1253      CMP.B       #5,D3                   ; Si on a testé toutes les couleurs utilisateurs pour la couleur donnée
+000015C2  6700 0016               1254      BEQ         SUITE_COULEUR_MACHINE   ; On passe à la prochaine couleur machine
+000015C6                          1255  PAS_EGAL_A_5:
+000015C6  1E11                    1256      MOVE.B      (A1),D7                 ; Si non, on stock dans D7 la couleur de l'utilisateur à tester avec la couleur machine dans D4
+000015C8  B807                    1257      CMP.B       D7,D4                   ; Si les couleurs sont égales, c'est qu'elles sont mal placées
+000015CA  6700 0008               1258      BEQ         MAL_PLACE               
+000015CE  5203                    1259      ADD.B       #1,D3                   ; Si non, on incrémente le compteur de couleurs utilisateurs
+000015D0  5289                    1260      ADD.L       #1,A1                   ; On déplace le pointeur sur le tableau de COLOR_USER
+000015D2  60EA                    1261      BRA         BOUCLE_COULEUR_USER     ; Puis on passe à la couleur de l'utilisateur suivante
+000015D4                          1262  MAL_PLACE:
+000015D4  5202                    1263      ADD.B       #1,D2                   ; On incrémente le compteur de couleurs bonnes et mal placées
+000015D6  12BC 00FF               1264      MOVE.B      #$FF,(A1)               ; On met la couleur de l'utilisateur testée à $FF, pour ne plus l'utiliser
+000015DA                          1265  SUITE_COULEUR_MACHINE:
+000015DA  5200                    1266      ADD.B       #1,D0                   ; On incrémente le nombre de couleur de la machine testées
+000015DC  60C4                    1267      BRA         BOUCLE_VERIF_BON_MAL_PLACE  ; On va au début de la boucle 
+000015DE                          1268  
+000015DE                          1269  ** bouton verif
+000015DE                          1270      
+000015DE                          1271  BOUTON_VERIF:   
+000015DE  7200                    1272      MOVE.L      #0,D1                   ; Déplacement de 0 dans D1
+000015E0  4EB9 00001A42           1273      JSR         GET_MOUSE               ; On utilise GET_MOUSE
+000015E6  B03C 0001               1274      CMP.B       #1,D0                   ; On test si le clic gauche est pressé
+000015EA  66F2                    1275      BNE         BOUTON_VERIF            ; Si non, on test de nouveau
+000015EC                          1276  FIN_BOUCLE_CLIC_VERIF:                  ; Si le clic est gauche est pressé
+000015EC  3601                    1277      MOVE.W      D1,D3                   ; On déplace les coordonnées X dans D3
+000015EE  4841                    1278      SWAP        D1                      ; On inverse les deux octets de poids faible avec ceux de poids fort pour sauvegarder les coordonnées Y
+000015F0  3801                    1279      MOVE.W      D1,D4                   ; On déplace les coordonées Y dans D4
+000015F2                          1280  TEST_CARRE_VERIF:                       ; On test le clic dans le carré de vérification    
+000015F2  B67C 02A8               1281      CMP.W       #680,D3                 ; x > 680
+000015F6  6A00 0004               1282      BPL         SUITE_CARRE_VERIF_XM    ; Si oui, on continue
+000015FA  60E2                    1283      BRA         BOUTON_VERIF            ; Si non, on retente un clic
+000015FC                          1284  SUITE_CARRE_VERIF_XM:
+000015FC  B67C 0366               1285      CMP.W       #870,D3                 ; x < 870
+00001600  6B00 0004               1286      BMI         SUITE_CARRE_VERIF_YP    ; Si oui, on continue
+00001604  60D8                    1287      BRA         BOUTON_VERIF            ; Si non, on retente un clic
+00001606                          1288  SUITE_CARRE_VERIF_YP:
+00001606  B87C 024E               1289      CMP.W       #590,D4                 ; y > 590
+0000160A  6A00 0004               1290      BPL         SUITE_CARRE_VERIF_YM    ; Si oui, on continue
+0000160E  60CE                    1291      BRA         BOUTON_VERIF            ; Si non, on retente un clic
+00001610                          1292  SUITE_CARRE_VERIF_YM:
+00001610  B87C 02A8               1293      CMP.W       #680,D4                 ; y > 680
+00001614  6AC8                    1294      BPL         BOUTON_VERIF            ; Si oui, on retente un clic
+00001616  6000 0002               1295      BRA         STOCK_COLOR_MACHINE     ; Si non, on est sur le carré de vérification
+0000161A                          1296      
+0000161A                          1297  STOCK_COLOR_MACHINE:                    
+0000161A  103C 0000               1298      MOVE.B      #0,D0                   ; On prend D0 comme compteur pour stocker les couleurs de la machine sélectionnées au début (car modification pour la vérification)
+0000161E  207C 00001AA2           1299      MOVE.L      #COLOR_MACHINE,A0       ; On stock les couleurs de la machine originelles
+00001624  227C 00001AA7           1300      MOVE.L      #COLOR_MACHINE_STOCK,A1 ; Puis on stock l'adresse du tableau de là où vont être stockées les couleurs originelles
+0000162A                          1301  BOUCLE_STOCK:
+0000162A  B03C 0005               1302      CMP.B       #5,D0                   ; Si on arrive à 5 couleurs, on a terminé
+0000162E  6700 FF1C               1303      BEQ         BOUCLE_VERIF            
+00001632  12D8                    1304      MOVE.B      (A0)+,(A1)+             ; Sinon, on déplace la couleur de COLOR_MACHINE[i] dans COLOR_MACHINE_STOCK[i]
+00001634  5200                    1305      ADD.B       #1,D0                   ; On incrémente le compteur
+00001636  60F2                    1306      BRA         BOUCLE_STOCK            ; On recommence jusqu'à avoir tout stocké
+00001638                          1307     
+00001638                          1308  WIN:
+00001638  267C 00001D14           1309      MOVE.L      #WIN_LOOSE_BOOL,A3      ; Si le joueur a gagné, on place dans la variable WIN_LOOSE_BOOL, la valeur 1
+0000163E  16BC 0001               1310      MOVE.B      #1,(A3)
+00001642  6000 0010               1311      BRA         ENDGAME                 ; On branche à la fin de partie
+00001646                          1312  
+00001646                          1313  LOOSE:   
+00001646  267C 00001D14           1314      MOVE.L      #WIN_LOOSE_BOOL,A3      ; Si le joueur a perdu, on place dans la variable WIN_LOOSE_BOOL, la valeur 2
+0000164C  16BC 0002               1315      MOVE.B      #2,(A3)
+00001650  6000 0002               1316      BRA         ENDGAME                 ; On branche à la fin de partie
+00001654                          1317     
+00001654                          1318  ENDGAME:
+00001654  1A3C 0000               1319      MOVE.B      #0,D5                   ; On met D5 à 0, qui sert de compteur pour Affiche_Solution
+00001658  207C 00001AA2           1320      MOVE.L      #COLOR_MACHINE,A0       ; On stock l'adresse du tableau de COLOR_MACHINE
+0000165E  6000 0024               1321      BRA         Affiche_Solution        ; On affiche la solution
+00001662                          1322  SUITE_ENDGAME:
+00001662  7E00                    1323      MOVE.L      #0,D7                   ; On initialise le compteur D7 à 0
+00001664                          1324  COMPTEUR:
+00001664  BEBC 00030D40           1325      CMP.L       #200000,D7              ; On attend que D7 soit à 200000 (pour laisser l'utilisateur voir la solution)
+0000166A  6700 0006               1326      BEQ         SUITE_COMPTEUR
+0000166E  5287                    1327      ADD.L       #1,D7
+00001670  60F2                    1328      BRA         COMPTEUR
+00001672                          1329  SUITE_COMPTEUR:
+00001672  267C 00001D14           1330      MOVE.L      #WIN_LOOSE_BOOL,A3      ; On regarde la valeur de la variable WIN_LOOSE_BOOL
+00001678  0C13 0001               1331      CMP.B       #1,(A3)
+0000167C  6700 003E               1332      BEQ         AFFICHE_WIN             ; Si la variable est égale à 1, le joueur a gagné
+00001680  6000 009A               1333      BRA         AFFICHE_LOOSE           ; Si non, le joueur a perdu
+00001684                          1334  
+00001684                          1335  Affiche_Solution:
+00001684  BA3C 0005               1336      CMP.B       #5,D5                   ; Si on a affiché les 5 couleurs de la machine, on passe à la suite
+00001688  67D8                    1337      BEQ         SUITE_ENDGAME
+0000168A  1C18                    1338      MOVE.B      (A0)+,D6                ; Si non, on prend dans D6 la valeur de la couleur
+0000168C  4EB9 0000182C           1339      JSR         Selectionne_Couleur     ; On modifie la couleur selon la couleur dans le tableau
+00001692  287C 00001D04           1340      MOVE.L      #PLACE_POS_SOLUCE_Y1,A4 ; On récupère les positions où dessiner les solutions
+00001698  2C7C 00001D06           1341      MOVE.L      #PLACE_POS_SOLUCE_Y2,A6
+0000169E                          1342  ; On positionne les valeurs en x1 x2 y1 y2 pour dessiner
+0000169E  323C 0445               1343      MOVE.W      #1093,D1                  
+000016A2  3414                    1344      MOVE.W      (A4),D2
+000016A4  363C 0477               1345      MOVE.W      #1143,D3
+000016A8  3816                    1346      MOVE.W      (A6),D4
+000016AA  0654 004B               1347      ADD.W       #75,(A4)
+000016AE  0656 004B               1348      ADD.W       #75,(A6)
+000016B2  4EB9 00001A82           1349      JSR         DRAW_FILL_RECT
+000016B8  5205                    1350      ADD.B       #1,D5                   ; On incrémente le compteur de couleurs affichées
+000016BA  60C8                    1351      BRA         Affiche_Solution
+000016BC                          1352  
+000016BC                          1353  AFFICHE_WIN:
+000016BC  7200                    1354      MOVE.L      #$00000000,D1           ; On affiche le background de fin de partie
+000016BE  4EB9 00001A4A           1355      JSR         SET_PEN_COLOR
+000016C4  223C 00A0A59C           1356      MOVE.L      #$00A0A59C,D1
+000016CA  4EB9 00001A52           1357      JSR         SET_FILL_COLOR
+000016D0  323C 0005               1358      MOVE.W      #5,D1
+000016D4  343C 0005               1359      MOVE.W      #5,D2
+000016D8  363C 0497               1360      MOVE.W      #1175,D3
+000016DC  383C 0307               1361      MOVE.W      #775,D4
+000016E0  4EB9 00001A82           1362      JSR         DRAW_FILL_RECT 
+000016E6                          1363      
+000016E6  223C 00A0A59C           1364      MOVE.L      #$00A0A59C,D1           ; On affiche le texte de victoire
+000016EC  4EB9 00001A52           1365      JSR         SET_FILL_COLOR
+000016F2  227C 00001CE5           1366      MOVE.L      #TEXTE_WIN,A1
+000016F8  223C 00FFFFFF           1367      MOVE.L      #$00FFFFFF,D1
+000016FE  243C 062B0001           1368      MOVE.L      #$062B0001,D2
+00001704  103C 0015               1369      MOVE.B      #21,D0
+00001708  4E4F                    1370      TRAP        #15
+0000170A  323C 01C2               1371      MOVE.W      #450,D1
+0000170E  343C 0032               1372      MOVE.W      #50,D2
+00001712  4EB9 00001A9A           1373      JSR         DRAW_STRING
+00001718                          1374      
+00001718  6000 0062               1375      BRA         AFFICHE_RESTART
+0000171C                          1376      
+0000171C                          1377  AFFICHE_LOOSE:
+0000171C  7200                    1378      MOVE.L      #$00000000,D1           ; On affiche le background de fin de partie
+0000171E  4EB9 00001A4A           1379      JSR         SET_PEN_COLOR
+00001724  223C 00A0A59C           1380      MOVE.L      #$00A0A59C,D1
+0000172A  4EB9 00001A52           1381      JSR         SET_FILL_COLOR
+00001730  323C 0005               1382      MOVE.W      #5,D1
+00001734  343C 0005               1383      MOVE.W      #5,D2
+00001738  363C 0497               1384      MOVE.W      #1175,D3
+0000173C  383C 0307               1385      MOVE.W      #775,D4
+00001740  4EB9 00001A82           1386      JSR         DRAW_FILL_RECT 
+00001746                          1387  
+00001746  223C 00A0A59C           1388      MOVE.L      #$00A0A59C,D1           ; On affiche le texte de perdu
+0000174C  4EB9 00001A52           1389      JSR         SET_FILL_COLOR
+00001752  227C 00001CF0           1390      MOVE.L      #TEXTE_LOOSE,A1
+00001758  223C 00FFFFFF           1391      MOVE.L      #$00FFFFFF,D1
+0000175E  243C 062B0001           1392      MOVE.L      #$062B0001,D2
+00001764  103C 0015               1393      MOVE.B      #21,D0
+00001768  4E4F                    1394      TRAP        #15
+0000176A  323C 01F4               1395      MOVE.W      #500,D1
+0000176E  343C 0032               1396      MOVE.W      #50,D2
+00001772  4EB9 00001A9A           1397      JSR         DRAW_STRING
+00001778                          1398      
+00001778  6000 0002               1399      BRA         AFFICHE_RESTART
+0000177C                          1400  
+0000177C                          1401  AFFICHE_RESTART:
+0000177C                          1402  * affichage bouton menu
+0000177C  7200                    1403      MOVE.L      #$00000000,D1           ; On affiche le bouton pour le menu
+0000177E  4EB9 00001A4A           1404      JSR         SET_PEN_COLOR
+00001784  223C 006C6C6C           1405      MOVE.L      #$006C6C6C,D1
+0000178A  4EB9 00001A52           1406      JSR         SET_FILL_COLOR
+00001790  323C 01F4               1407      MOVE.W      #500,D1
+00001794  343C 01F4               1408      MOVE.W      #500,D2
+00001798  363C 02AD               1409      MOVE.W      #685,D3
+0000179C  383C 0258               1410      MOVE.W      #600,D4
+000017A0  4EB9 00001A82           1411      JSR         DRAW_FILL_RECT 
+000017A6                          1412      
+000017A6  227C 00001CDB           1413      MOVE.L      #REGLES_MENU_BUTTON,A1  ; On affiche le texte MENU sur le bouton    
+000017AC  7200                    1414      MOVE.L      #$00000000,D1
+000017AE  243C 061E0001           1415      MOVE.L      #$061E0001,D2
+000017B4  103C 0015               1416      MOVE.B      #21,D0
+000017B8  4E4F                    1417      TRAP        #15
+000017BA  323C 0221               1418      MOVE.W      #545,D1
+000017BE  343C 0212               1419      MOVE.W      #530,D2
+000017C2  4EB9 00001A9A           1420      JSR         DRAW_STRING
+000017C8                          1421      
+000017C8                          1422  CLIC_RETURN_FIN:    
+000017C8  7200                    1423      MOVE.L      #0,D1                   ; Déplacement de 0 dans D1 afin de récupérer
+000017CA  4EB9 00001A42           1424      JSR         GET_MOUSE               ; On utilise GET_MOUSE (Stock dans D0.B, les informations du clic, dans D1.L et la position de la souris (16 bits Y, 16 bits X))
+000017D0  B03C 0001               1425      CMP.B       #1,D0                   ; On test si le clic gauche est pressé
+000017D4  66F2                    1426      BNE         CLIC_RETURN_FIN         ; Si non, on test de nouveau
+000017D6                          1427  RELACHE_CLIC_FIN:
+000017D6  7200                    1428      MOVE.L      #0,D1                   ; On met D1 à 0 pour retenter un nouveau clic
+000017D8  4EB9 00001A42           1429      JSR         GET_MOUSE
+000017DE  B03C 0000               1430      CMP.B       #0,D0                   ; Si on relâche le clic gauche, on passe à la suite
+000017E2  66F2                    1431      BNE         RELACHE_CLIC_FIN        ; Si non, on revérifie le relâchement du clic
+000017E4                          1432  FIN_BOUCLE_CLIC_FIN:                    ; Si le clic est gauche est relâché
+000017E4  3601                    1433      MOVE.W      D1,D3                   ; On déplace les coordonnées X dans D3
+000017E6  4841                    1434      SWAP        D1                      ; On inverse les deux octets de poids faible avec ceux de poids fort pour sauvegarder les coordonnées Y
+000017E8  3801                    1435      MOVE.W      D1,D4                   ; On déplace les coordonées Y dans D4    
+000017EA                          1436    
+000017EA                          1437  TEST_BACK_MENU_FIN:
+000017EA  B67C 01F4               1438      CMP.W       #500,D3                 ; x > 500
+000017EE  6A00 0004               1439      BPL         SUITE_MENU_FIN_XM       ; Si oui, on continue
+000017F2  60D4                    1440      BRA         CLIC_RETURN_FIN         ; Si non, on retente un clic souris
+000017F4                          1441  SUITE_MENU_FIN_XM:                    
+000017F4  B67C 02AD               1442      CMP.W       #685,D3                 ; x < 685
+000017F8  6B00 0004               1443      BMI         SUITE_MENU_FIN_YP       ; Si oui, on continue
+000017FC  60CA                    1444      BRA         CLIC_RETURN_FIN         ; Si x > 100, on test le carré adjacent au bleu (ici, le jaune)
+000017FE                          1445  SUITE_MENU_FIN_YP:
+000017FE  B87C 01F4               1446      CMP.W       #500,D4                 ; y > 500
+00001802  6A00 0004               1447      BPL         SUITE_MENU_FIN_YM       ; Si oui, on continue
+00001806  60C0                    1448      BRA         CLIC_RETURN_FIN         ; Si non, on retente un clic souris
+00001808                          1449  SUITE_MENU_FIN_YM:                    
+00001808  B87C 0258               1450      CMP.W       #600,D4                 ; y > 600
+0000180C  6ABA                    1451      BPL         CLIC_RETURN_FIN         ; Si oui, on retente un clic
+0000180E  6000 EBFC               1452      BRA         MENU                    ; Si non, on va au menu
+00001812                          1453  
+00001812                          1454  
+00001812                          1455  FIN_PRG:
+00001812  4EF9 00001A34           1456      JMP         FINPRG
+00001818                          1457  
+00001818                          1458  Randomize:
+00001818  0683 0003E8BB           1459      ADD.L       #256187,D3              ; Notre fonction de générateur est I(n) = (I(n-1) + 256187) mod 8
+0000181E  86FC 0008               1460      DIVU        #8,D3                   ; Division par 8
+00001822  4843                    1461      SWAP        D3                      ; Inversion des 2 octets de poids faible avec les deux octets de poids fort
+00001824  C6BC 0000FFFF           1462      AND.L       #$0000FFFF,D3           ; On garde uniquement le reste dans D3, en retirant le quotient à l'aide d'un masque.
+0000182A  4E75                    1463      RTS
+0000182C                          1464  
+0000182C                          1465      
+0000182C                          1466  Selectionne_Couleur:
+0000182C                          1467  BLEU:
+0000182C  BC3C 0000               1468      CMP.B       #0,D6                   
+00001830  6700 003A               1469      BEQ         COULEUR_FINALE_BLEU     ; Si la couleur est bleu, on change la couleur du crayon en BLEU
+00001834                          1470  JAUNE:
+00001834  BC3C 0001               1471      CMP.B       #1,D6
+00001838  6700 0046               1472      BEQ         COULEUR_FINALE_JAUNE    ; Si la couleur est jaune, on change la couleur du crayon en JAUNE
+0000183C                          1473  VERT:
+0000183C  BC3C 0002               1474      CMP.B       #2,D6
+00001840  6700 0052               1475      BEQ         COULEUR_FINALE_VERT     ; Si la couleur est vert, on change la couleur du crayon en VERT
+00001844                          1476  ROUGE:
+00001844  BC3C 0003               1477      CMP.B       #3,D6
+00001848  6700 005E               1478      BEQ         COULEUR_FINALE_ROUGE    ; Si la couleur est rouge, on change la couleur du crayon en ROUGE
+0000184C                          1479  VIOLET
+0000184C  BC3C 0004               1480      CMP.B       #4,D6
+00001850  6700 006A               1481      BEQ         COULEUR_FINALE_VIOLET   ; Si la couleur est violet, on change la couleur du crayon en VIOLET
+00001854                          1482  ORANGE:
+00001854  BC3C 0005               1483      CMP.B       #5,D6
+00001858  6700 0076               1484      BEQ         COULEUR_FINALE_ORANGE   ; Si la couleur est orange, on change la couleur du crayon en ORANGE
+0000185C                          1485  ROSE:
+0000185C  BC3C 0006               1486      CMP.B       #6,D6
+00001860  6700 0082               1487      BEQ         COULEUR_FINALE_ROSE     ; Si la couleur est rose, on change la couleur du crayon en ROSE
+00001864                          1488  MARRON:
+00001864  BC3C 0007               1489      CMP.B       #7,D6
+00001868  6700 008E               1490      BEQ         COULEUR_FINALE_MARRON   ; Si la couleur est marron, on change la couleur du crayon en MARRON
+0000186C                          1491  
+0000186C                          1492  COULEUR_FINALE_BLEU:
+0000186C  223C 00EC5A07           1493      MOVE.L      #$00EC5A07,D1
+00001872  4EB9 00001A52           1494      JSR         SET_FILL_COLOR
+00001878  4EB9 00001A4A           1495      JSR         SET_PEN_COLOR
+0000187E  4E75                    1496      RTS
+00001880                          1497  
+00001880                          1498  COULEUR_FINALE_JAUNE:
+00001880  223C 0047F2FF           1499      MOVE.L      #$0047F2FF,D1
+00001886  4EB9 00001A52           1500      JSR         SET_FILL_COLOR
+0000188C  4EB9 00001A4A           1501      JSR         SET_PEN_COLOR
+00001892  4E75                    1502      RTS
+00001894                          1503  
+00001894                          1504  COULEUR_FINALE_VERT:
+00001894  223C 006DDD43           1505      MOVE.L      #$006DDD43,D1
+0000189A  4EB9 00001A52           1506      JSR         SET_FILL_COLOR
+000018A0  4EB9 00001A4A           1507      JSR         SET_PEN_COLOR
+000018A6  4E75                    1508      RTS
+000018A8                          1509  
+000018A8                          1510  COULEUR_FINALE_ROUGE:
+000018A8  223C 000607E7           1511      MOVE.L      #$000607E7,D1
+000018AE  4EB9 00001A52           1512      JSR         SET_FILL_COLOR
+000018B4  4EB9 00001A4A           1513      JSR         SET_PEN_COLOR
+000018BA  4E75                    1514      RTS
+000018BC                          1515  
+000018BC                          1516  COULEUR_FINALE_VIOLET:
+000018BC  223C 00FF3881           1517      MOVE.L      #$00FF3881,D1
+000018C2  4EB9 00001A52           1518      JSR         SET_FILL_COLOR
+000018C8  4EB9 00001A4A           1519      JSR         SET_PEN_COLOR
+000018CE  4E75                    1520      RTS
+000018D0                          1521  
+000018D0                          1522  COULEUR_FINALE_ORANGE:
+000018D0  223C 00154CFB           1523      MOVE.L      #$00154CFB,D1
+000018D6  4EB9 00001A52           1524      JSR         SET_FILL_COLOR
+000018DC  4EB9 00001A4A           1525      JSR         SET_PEN_COLOR
+000018E2  4E75                    1526      RTS
+000018E4                          1527  
+000018E4                          1528  COULEUR_FINALE_ROSE:
+000018E4  223C 00DD32EE           1529      MOVE.L      #$00DD32EE,D1
+000018EA  4EB9 00001A52           1530      JSR         SET_FILL_COLOR
+000018F0  4EB9 00001A4A           1531      JSR         SET_PEN_COLOR
+000018F6  4E75                    1532      RTS
+000018F8                          1533  
+000018F8                          1534  COULEUR_FINALE_MARRON:
+000018F8  223C 00183C90           1535      MOVE.L      #$00183C90,D1
+000018FE  4EB9 00001A52           1536      JSR         SET_FILL_COLOR
+00001904  4EB9 00001A4A           1537      JSR         SET_PEN_COLOR
+0000190A  4E75                    1538      RTS
+0000190C                          1539      
+0000190C                          1540   
+0000190C                          1541  Dessin_Carre_User:
+0000190C  4EB9 00001A4A           1542      JSR         SET_PEN_COLOR                   ; On change les couleurs avec la couleur définie au préalable dans les clic
+00001912  4EB9 00001A52           1543      JSR         SET_FILL_COLOR
+00001918  267C 00001CFC           1544      MOVE.L      #PLACE_POS_X1,A3                ; On récupère les positions dans les variables
+0000191E  287C 00001D00           1545      MOVE.L      #PLACE_POS_Y1,A4
+00001924  2A7C 00001CFE           1546      MOVE.L      #PLACE_POS_X2,A5
+0000192A  2C7C 00001D02           1547      MOVE.L      #PLACE_POS_Y2,A6
+00001930  3213                    1548      MOVE.W      (A3),D1                         ; On positionnne le rectangle
+00001932  3414                    1549      MOVE.W      (A4),D2 
+00001934  3615                    1550      MOVE.W      (A5),D3 
+00001936  3816                    1551      MOVE.W      (A6),D4
+00001938  0654 004B               1552      ADD.W       #75,(A4)                        ; On ajoute 75 pour passer au rectangle d'après
+0000193C  0656 004B               1553      ADD.W       #75,(A6)
+00001940  4EB9 00001A82           1554      JSR         DRAW_FILL_RECT                  ; On dessine le rectangle
+00001946  4E75                    1555      RTS 
+00001948                          1556      
+00001948                          1557  Dessin_Pion_Placement:
+00001948  267C 00001D08           1558      MOVE.L      #PLACE_POS_X1_BIEN_PLACE,A3     ; On récupère les coordonnées de là où on dessine les rectangles
+0000194E  287C 00001D0C           1559      MOVE.L      #PLACE_POS_Y1_BIEN_PLACE,A4
+00001954  2A7C 00001D0A           1560      MOVE.L      #PLACE_POS_X2_BIEN_PLACE,A5
+0000195A  2C7C 00001D0E           1561      MOVE.L      #PLACE_POS_Y2_BIEN_PLACE,A6
+00001960  223C 00FFFFFF           1562      MOVE.L      #$00FFFFFF,D1                   ; On met le crayon en blanc
+00001966  4EB9 00001A52           1563      JSR         SET_FILL_COLOR  
+0000196C  223C 00FFFFFF           1564      MOVE.L      #$00FFFFFF,D1
+00001972  4EB9 00001A4A           1565      JSR         SET_PEN_COLOR
+00001978  3213                    1566      MOVE.W      (A3),D1                         ; On rentre dans D1 D2 D3 D4 les positions en x1 y1 x2 y2 du cercle
+0000197A  3414                    1567      MOVE.W      (A4),D2
+0000197C  3615                    1568      MOVE.W      (A5),D3
+0000197E  3816                    1569      MOVE.W      (A6),D4
+00001980  4EB9 00001A8A           1570      JSR         DRAW_FILL_ELLIPSE               ; On dessine un cercle
+00001986  0454 0028               1571      SUB.W       #40,(A4)                        ; On retire 40 en y1 y2 pour le prochain cercle
+0000198A  0456 0028               1572      SUB.W       #40,(A6)
+0000198E  7200                    1573      MOVE.L      #$0,D1                          ; On met la couleur du cercle en noir
+00001990  4EB9 00001A52           1574      JSR         SET_FILL_COLOR
+00001996  7200                    1575      MOVE.L      #$0,D1
+00001998  4EB9 00001A4A           1576      JSR         SET_PEN_COLOR
+0000199E  3213                    1577      MOVE.W      (A3),D1                         ; On rentre dans D1 D2 D3 D4 les positions en x1 y1 x2 y2 du cercle
+000019A0  3414                    1578      MOVE.W      (A4),D2
+000019A2  3615                    1579      MOVE.W      (A5),D3
+000019A4  3816                    1580      MOVE.W      (A6),D4
+000019A6  4EB9 00001A8A           1581      JSR         DRAW_FILL_ELLIPSE               ; On dessine un cercle
+000019AC  0654 0028               1582      ADD.W       #40,(A4)                        ; On ajoute en y 40 pour repositionner le y sur le y du cercle blanc
+000019B0  0656 0028               1583      ADD.W       #40,(A6)
+000019B4  0653 0064               1584      ADD.W       #100,(A3)                       ; On ajoute 100 en x1 x2 pour se décaler au rectangle de la prochaine tentative
+000019B8  0655 0064               1585      ADD.W       #100,(A5)
+000019BC                          1586      
+000019BC  223C 00FFFFFF           1587      MOVE.L      #$00FFFFFF,D1                   ; On modifie la couleur, la police, et le style du texte
+000019C2  243C 03100000           1588      MOVE.L      #$03100000,D2
+000019C8  103C 0015               1589      MOVE.B      #21,D0
+000019CC  4E4F                    1590      TRAP        #15
+000019CE                          1591      
+000019CE  223C 006C6C6C           1592      MOVE.L      #$006C6C6C,D1                   ; On modifie la couleur de fond du dessin
+000019D4  4EB9 00001A52           1593      JSR         SET_FILL_COLOR
+000019DA                          1594      
+000019DA  227C 00001CF8           1595      MOVE.L      #NOMBRE_A_PLACER,A1             ; On récupère les positions x y du texte à afficher, ainsi que le texte à afficher
+000019E0  267C 00001D10           1596      MOVE.L      #PLACE_POS_X1_CHIFFRE,A3
+000019E6  287C 00001D12           1597      MOVE.L      #PLACE_POS_Y1_CHIFFRE,A4
+000019EC  2A7C 00001CFA           1598      MOVE.L      #NOMBRE_BIEN_PLACE,A5           
+000019F2  0615 0030               1599      ADD.B       #48,(A5)                        ; On incrémente 48 pour afficher le caractère du chiffre
+000019F6  1295                    1600      MOVE.B      (A5),(A1)                       ; On met notre chiffre à afficher dans NOMBRE_A_PLACE
+000019F8  3213                    1601      MOVE.W      (A3),D1                         ; On met les positions en x y du texte dans D1 et D2
+000019FA  3414                    1602      MOVE.W      (A4),D2
+000019FC  4EB9 00001A9A           1603      JSR         DRAW_STRING                     ; On affiche le chiffre
+00001A02                          1604          
+00001A02  0454 0026               1605      SUB.W       #38,(A4)                        ; On retire 48 en Y 
+00001A06  2A7C 00001CFB           1606      MOVE.L      #NOMBRE_MAL_PLACE,A5            ; On prend le nombre de pions mal placés, pour le dessiner
+00001A0C  0615 0030               1607      ADD.B       #48,(A5)                        ; On ajoute 48 pour afficher le caractère 'chiffre'
+00001A10  3414                    1608      MOVE.W      (A4),D2                         ; On affecte à D2 la valeur en Y
+00001A12  1295                    1609      MOVE.B      (A5),(A1)                       ; On affecte la valeur du nombre à dessiner
+00001A14  4EB9 00001A9A           1610      JSR         DRAW_STRING
+00001A1A                          1611      
+00001A1A  0654 0026               1612      ADD.W       #38,(A4)
+00001A1E  0653 0064               1613      ADD.W       #100,(A3)
+00001A22                          1614      
+00001A22  4E75                    1615      RTS
+00001A24                          1616      
+00001A24                          1617  
+00001A24                          1618  * Put variables and constants here
+00001A24                          1619  
+00001A24                          1620      INCLUDE 'biblio.X68'
+00001A24                          1621  
+00001A24                          1622  AFFCAR:
+00001A24  303C 0006               1623      MOVE #6,D0
+00001A28  4E4F                    1624      TRAP #15
+00001A2A  4E75                    1625      RTS
+00001A2C                          1626     
+00001A2C                          1627  SAISCAR:
+00001A2C  303C 0005               1628      MOVE #5,D0
+00001A30  4E4F                    1629      TRAP #15
+00001A32  4E75                    1630      RTS
+00001A34                          1631     
+00001A34                          1632  FINPRG:
+00001A34  303C 0009               1633      MOVE #9,D0
+00001A38  4E4F                    1634      TRAP #15
+00001A3A                          1635  
+00001A3A                          1636  -------------------- end include --------------------
+00001A3A                          1637      INCLUDE 'bibperiph.X68'
+00001A3A                          1638  
+00001A3A                          1639  RESOLUTION:
+00001A3A  303C 0021               1640      MOVE #33,D0
+00001A3E  4E4F                    1641      TRAP #15
+00001A40  4E75                    1642      RTS
+00001A42                          1643      
+00001A42                          1644  GET_MOUSE:
+00001A42  303C 003D               1645      MOVE #61,D0
+00001A46  4E4F                    1646      TRAP #15
+00001A48  4E75                    1647      RTS
+00001A48  4E75                    1648  -------------------- end include --------------------
+00001A4A                          1649      INCLUDE 'bibgraph.X68'
+00001A4A                          1650  
+00001A4A                          1651  SET_PEN_COLOR:
+00001A4A  303C 0050               1652      MOVE #80,D0
+00001A4E  4E4F                    1653      TRAP #15
+00001A50  4E75                    1654      RTS
+00001A52                          1655  
+00001A52                          1656  SET_FILL_COLOR:
+00001A52  303C 0051               1657      MOVE #81,D0
+00001A56  4E4F                    1658      TRAP #15
+00001A58  4E75                    1659      RTS
+00001A5A                          1660  
+00001A5A                          1661  DRAW_PIX:
+00001A5A  303C 0052               1662      MOVE #82,D0
+00001A5E  4E4F                    1663      TRAP #15
+00001A60  4E75                    1664      RTS
+00001A62                          1665      
+00001A62                          1666  GET_PIX_COLOR:
+00001A62  303C 0053               1667      MOVE #83,D0
+00001A66  4E4F                    1668      TRAP #15
+00001A68  4E75                    1669      RTS
+00001A6A                          1670      
+00001A6A                          1671  DRAW_LINE:
+00001A6A  303C 0054               1672      MOVE #84,D0
+00001A6E  4E4F                    1673      TRAP #15
+00001A70  4E75                    1674      RTS
+00001A72                          1675   
+00001A72                          1676  DRAW_TO:
+00001A72  303C 0055               1677      MOVE #85,D0
+00001A76  4E4F                    1678      TRAP #15
+00001A78  4E75                    1679      RTS
+00001A7A                          1680      
+00001A7A                          1681  MOVE_TO:
+00001A7A  303C 0056               1682      MOVE #86,D0
+00001A7E  4E4F                    1683      TRAP #15
+00001A80  4E75                    1684      RTS
+00001A82                          1685   
+00001A82                          1686  DRAW_FILL_RECT:
+00001A82  303C 0057               1687      MOVE #87,D0
+00001A86  4E4F                    1688      TRAP #15
+00001A88  4E75                    1689      RTS
+00001A8A                          1690      
+00001A8A                          1691  DRAW_FILL_ELLIPSE:
+00001A8A  303C 0058               1692      MOVE #88,D0
+00001A8E  4E4F                    1693      TRAP #15
+00001A90  4E75                    1694      RTS
+00001A92                          1695      
+00001A92                          1696  POT_DE_PEINTURE:
+00001A92  303C 0059               1697      MOVE #89,D0
+00001A96  4E4F                    1698      TRAP #15
+00001A98  4E75                    1699      RTS
+00001A9A                          1700      
+00001A9A                          1701  DRAW_STRING:
+00001A9A  303C 005F               1702      MOVE #95,D0
+00001A9E  4E4F                    1703      TRAP #15
+00001AA0  4E75                    1704      RTS
+00001AA2                          1705     
+00001AA2                          1706     
+00001AA2                          1707  
+00001AA2                          1708  
+00001AA2                          1709  
+00001AA2                          1710  -------------------- end include --------------------
+00001AA2                          1711      
+00001AA2                          1712  COLOR_MACHINE:  DS.B 5                   ; Déclaration du tableau de couleur de la machine
+00001AA7                          1713  COLOR_MACHINE_STOCK: DS.B 5              ; Déclaration du tableau pour stocker les couleurs machines (pour la vérification)
+00001AAC                          1714  COLOR_USER:     DS.B 5                   ; Déclaration du tableau de couleur du joueur
+00001AB1= 3F 00                   1715  POINT_INTERR:   DC.B '?',0
+00001AB3                          1716  
+00001AB3= 4D 41 53 54 45 52 ...   1717  TEXTE_ACCUEIL: DC.B 'MASTERMIND',0
+00001ABE= 4C 61 6E 63 65 72 ...   1718  TEXTE_PLAY: DC.B 'Lancer le jeu',0
+00001ACC= 52 E8 67 6C 65 73 00    1719  TEXTE_REGLE: DC.B 'Règles',0
+00001AD3= 42 79 20 44 45 43 ...   1720  TEXTE_AUTHOR: DC.B 'By DECORTE Damien & DEHORS Pauline',0
+00001AF6                          1721  
+00001AF6= 52 E8 67 6C 65 73 ...   1722  REGLES_TITRE: DC.B 'Règles du jeu',0
+00001B04= 2D 20 4C 61 20 6D ...   1723  REGLES_L1: DC.B '- La machine mémorise un certain code constitué de 5 couleurs',0
+00001B42= 70 61 72 6D 69 20 ...   1724  REGLES_L2: DC.B 'parmi les 8 proposées. (Bleu, Jaune, Vert, Rouge, Violet',0
+00001B7B= 4F 72 61 6E 67 65 ...   1725  REGLES_L3: DC.B 'Orange, Rose, Marron).',0
+00001B92= 2D 20 4C 65 20 6A ...   1726  REGLES_L4: DC.B '- Le joueur va entrer un code de couleur qu',39,'il pense être le bon.',0
+00001BD4= 2D 20 41 20 63 68 ...   1727  REGLES_L5: DC.B '- A chaque tentative, la machine indique combien de couleurs',0
+00001C11= 73 6F 6E 74 20 63 ...   1728  REGLES_L6: DC.B 'sont correctes et bien placées mais aussi combien de couleurs',0
+00001C4F= 73 6F 6E 74 20 63 ...   1729  REGLES_L7: DC.B 'sont correctes mais mal placées.',0
+00001C70= 2D 20 47 72 E2 63 ...   1730  REGLES_L8: DC.B '- Grâce à ces indications, le joueur doit trouver le bon code avant',0
+00001CB4= 64 27 61 76 6F 69 ...   1731  REGLES_L9: DC.B 'd',39,'avoir utilisé toutes ses tentatives.',0
+00001CDB= 4D 45 4E 55 00          1732  REGLES_MENU_BUTTON: DC.B 'MENU',0
+00001CE0                          1733  
+00001CE0= 54 45 53 54 00          1734  TEST: DC.B 'TEST',0
+00001CE5= 56 49 43 54 4F 49 ...   1735  TEXTE_WIN: DC.B 'VICTOIRE !',0
+00001CF0= 50 45 52 44 55 20 ...   1736  TEXTE_LOOSE: DC.B 'PERDU !',0
+00001CF8                          1737  
+00001CF8= 20 00                   1738  NOMBRE_A_PLACER: DC.B ' ',0                 ; Texte à écrire pour le nombre de pions biens placés et bons et mal placés
+00001CFA                          1739  NOMBRE_BIEN_PLACE: DS.B 1                   ; Déclaration d'une variable pour le nombre de pions bien placés
+00001CFB                          1740  NOMBRE_MAL_PLACE: DS.B 1                    ; Déclaration d'une variable pour le nombre de pions bon et mal placés
+00001CFC                          1741  
+00001CFC= 002B                    1742  PLACE_POS_X1:   DC.W 43                     ; Positions des rectangles de couleurs choisies
+00001CFE= 005D                    1743  PLACE_POS_X2:   DC.W 93 
+00001D00= 0025                    1744  PLACE_POS_Y1:   DC.W 37
+00001D02= 0057                    1745  PLACE_POS_Y2:   DC.W 87
+00001D04                          1746  
+00001D04= 0025                    1747  PLACE_POS_SOLUCE_Y1:    DC.W    37          ; Positions des rectangles de la solution
+00001D06= 0057                    1748  PLACE_POS_SOLUCE_Y2:    DC.W    87
+00001D08                          1749  
+00001D08= 0028                    1750  PLACE_POS_X1_BIEN_PLACE:   DC.W 40          ; Positions des cercles de dessins des chiffres des placements des pions
+00001D0A= 003C                    1751  PLACE_POS_X2_BIEN_PLACE:   DC.W 60
+00001D0C= 01D8                    1752  PLACE_POS_Y1_BIEN_PLACE:   DC.W 472
+00001D0E= 01EC                    1753  PLACE_POS_Y2_BIEN_PLACE:   DC.W 492
+00001D10                          1754  
+00001D10= 0046                    1755  PLACE_POS_X1_CHIFFRE:   DC.W 70             ; Variables pour les positions des chiffres des placements des pions
+00001D12= 01D8                    1756  PLACE_POS_Y1_CHIFFRE:   DC.W 472
+00001D14                          1757  
+00001D14                          1758  WIN_LOOSE_BOOL:         DS.B 1
+00001D15                          1759  
+00001D15                          1760      END         $400        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AFFCAR              1A24
+AFFICHE_LOOSE       171C
+AFFICHE_RESTART     177C
+AFFICHE_SOLUTION    1684
+AFFICHE_WIN         16BC
+AJOUT_BIEN_PLACE    1576
+BLEU                182C
+BOUCLE_CHOIX_COULEUR_USER  12B8
+BOUCLE_COULEUR_USER  15BE
+BOUCLE_POUR_VERIF   12AA
+BOUCLE_STOCK        162A
+BOUCLE_VERIF        154C
+BOUCLE_VERIF_BIEN_PLACE  1560
+BOUCLE_VERIF_BON_MAL_PLACE  15A2
+BOUTON_VERIF        15DE
+CLIC_RETURN_FIN     17C8
+CLIC_RETURN_MENU    A3C
+CLIC_SOURIS         12C4
+CLIC_START_GAME     68E
+COLOR_MACHINE       1AA2
+COLOR_MACHINE_STOCK  1AA7
+COLOR_USER          1AAC
+COMPTEUR            1664
+COULEUR_FINALE_BLEU  186C
+COULEUR_FINALE_JAUNE  1880
+COULEUR_FINALE_MARRON  18F8
+COULEUR_FINALE_ORANGE  18D0
+COULEUR_FINALE_ROSE  18E4
+COULEUR_FINALE_ROUGE  18A8
+COULEUR_FINALE_VERT  1894
+COULEUR_FINALE_VIOLET  18BC
+DEBUT_PARTIE        A86
+DESSIN_CARRE_USER   190C
+DESSIN_PION_PLACEMENT  1948
+DRAW_FILL_ELLIPSE   1A8A
+DRAW_FILL_RECT      1A82
+DRAW_LINE           1A6A
+DRAW_PIX            1A5A
+DRAW_STRING         1A9A
+DRAW_TO             1A72
+ENDGAME             1654
+FINPRG              1A34
+FIN_BOUCLE_CLIC     12E0
+FIN_BOUCLE_CLIC_FIN  17E4
+FIN_BOUCLE_CLIC_RETURN_MENU  A58
+FIN_BOUCLE_CLIC_START_GAME  6AA
+FIN_BOUCLE_CLIC_VERIF  15EC
+FIN_CHOIX           151A
+FIN_POUR_CHOIX      12A2
+FIN_PRG             1812
+FIN_VERIF           14EC
+GET_MOUSE           1A42
+GET_PIX_COLOR       1A62
+JAUNE               1834
+LOOSE               1646
+MAL_PLACE           15D4
+MARRON              1864
+MENU                40C
+MOVE_TO             1A7A
+NOMBRE_A_PLACER     1CF8
+NOMBRE_BIEN_PLACE   1CFA
+NOMBRE_MAL_PLACE    1CFB
+ORANGE              1854
+PAS_EGAL_A_5        15C6
+PLACE_POS_SOLUCE_Y1  1D04
+PLACE_POS_SOLUCE_Y2  1D06
+PLACE_POS_X1        1CFC
+PLACE_POS_X1_BIEN_PLACE  1D08
+PLACE_POS_X1_CHIFFRE  1D10
+PLACE_POS_X2        1CFE
+PLACE_POS_X2_BIEN_PLACE  1D0A
+PLACE_POS_Y1        1D00
+PLACE_POS_Y1_BIEN_PLACE  1D0C
+PLACE_POS_Y1_CHIFFRE  1D12
+PLACE_POS_Y2        1D02
+PLACE_POS_Y2_BIEN_PLACE  1D0E
+POINT_INTERR        1AB1
+POT_DE_PEINTURE     1A92
+POUR_CHOIX_COULEUR  128E
+RANDOMIZE           1818
+REGLES              702
+REGLES_L1           1B04
+REGLES_L2           1B42
+REGLES_L3           1B7B
+REGLES_L4           1B92
+REGLES_L5           1BD4
+REGLES_L6           1C11
+REGLES_L7           1C4F
+REGLES_L8           1C70
+REGLES_L9           1CB4
+REGLES_MENU_BUTTON  1CDB
+REGLES_TITRE        1AF6
+RELACHE_CLIC        12D2
+RELACHE_CLIC_FIN    17D6
+RELACHE_CLIC_RETURN_MENU  A4A
+RELACHE_CLIC_START_GAME  69C
+RESOLUTION          1A3A
+ROSE                185C
+ROUGE               1844
+SAISCAR             1A2C
+SELECTIONNE_COULEUR  182C
+SET_FILL_COLOR      1A52
+SET_PEN_COLOR       1A4A
+START               400
+STOCK_COLOR_MACHINE  161A
+SUITE_BIEN_PLACE    1580
+SUITE_CARRE_BLEU_XM  12F0
+SUITE_CARRE_BLEU_YM  1306
+SUITE_CARRE_BLEU_YP  12FC
+SUITE_CARRE_JAUNE_XM  132C
+SUITE_CARRE_JAUNE_YM  1342
+SUITE_CARRE_JAUNE_YP  1338
+SUITE_CARRE_MARRON_XM  14B6
+SUITE_CARRE_MARRON_YM  14CE
+SUITE_CARRE_MARRON_YP  14C2
+SUITE_CARRE_ORANGE_XM  1432
+SUITE_CARRE_ORANGE_YM  144A
+SUITE_CARRE_ORANGE_YP  143E
+SUITE_CARRE_ROSE_XM  1474
+SUITE_CARRE_ROSE_YM  148C
+SUITE_CARRE_ROSE_YP  1480
+SUITE_CARRE_ROUGE_XM  13AE
+SUITE_CARRE_ROUGE_YM  13C6
+SUITE_CARRE_ROUGE_YP  13BA
+SUITE_CARRE_VERIF_XM  15FC
+SUITE_CARRE_VERIF_YM  1610
+SUITE_CARRE_VERIF_YP  1606
+SUITE_CARRE_VERT_XM  136C
+SUITE_CARRE_VERT_YM  1384
+SUITE_CARRE_VERT_YP  1378
+SUITE_CARRE_VIOLET_XM  13F0
+SUITE_CARRE_VIOLET_YM  1408
+SUITE_CARRE_VIOLET_YP  13FC
+SUITE_COMPTEUR      1672
+SUITE_COULEUR_MACHINE  15DA
+SUITE_ENDGAME       1662
+SUITE_MENU_FIN_XM   17F4
+SUITE_MENU_FIN_YM   1808
+SUITE_MENU_FIN_YP   17FE
+SUITE_REGLE_GAME_XM  6E4
+SUITE_REGLE_GAME_YM  6F8
+SUITE_REGLE_GAME_YP  6EE
+SUITE_REGLE_MENU_XM  A68
+SUITE_REGLE_MENU_YM  A7C
+SUITE_REGLE_MENU_YP  A72
+SUITE_START_GAME_XM  6BA
+SUITE_START_GAME_YM  6CE
+SUITE_START_GAME_YP  6C4
+TEST                1CE0
+TEST_BACK_MENU_FIN  17EA
+TEST_CARRE_BLEU     12E6
+TEST_CARRE_JAUNE    1322
+TEST_CARRE_MARRON   14AA
+TEST_CARRE_ORANGE   1426
+TEST_CARRE_ROSE     1468
+TEST_CARRE_ROUGE    13A2
+TEST_CARRE_VERIF    15F2
+TEST_CARRE_VERT     1360
+TEST_CARRE_VIOLET   13E4
+TEST_REGLE_GAME     6DA
+TEST_REGLE_MENU     A5E
+TEST_START_GAME     6B0
+TEXTE_ACCUEIL       1AB3
+TEXTE_AUTHOR        1AD3
+TEXTE_LOOSE         1CF0
+TEXTE_PLAY          1ABE
+TEXTE_REGLE         1ACC
+TEXTE_WIN           1CE5
+VERIF_BON_MAL_PLACE  1588
+VERT                183C
+VIOLET              184C
+WIN                 1638
+WIN_LOOSE_BOOL      1D14
